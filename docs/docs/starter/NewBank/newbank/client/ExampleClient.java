@@ -20,19 +20,26 @@ public class ExampleClient extends Thread{
 		bankServerOut = new PrintWriter(server.getOutputStream(), true); 
 		
 		bankServerResponceThread = new Thread() {
-			private BufferedReader bankServerIn = new BufferedReader(new InputStreamReader(server.getInputStream())); 
-			public void run() {
-				try {
-					while(true) {
-						String responce = bankServerIn.readLine();
-						System.out.println(responce);
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-					return;
-				}
+			private BufferedReader bankServerIn =
+      new BufferedReader(new InputStreamReader(server.getInputStream())); 
+	public void run() {
+		try {
+		while (true) {
+			String response = bankServerIn.readLine();
+
+			if (response == null) {
+			// server closed the connection
+			System.out.println("Connection closed by server.");
+			break;
 			}
-		};
+
+			System.out.println(response);
+		}
+		} catch (IOException e) {
+		e.printStackTrace();
+		}
+	}
+	};
 		bankServerResponceThread.start();
 	}
 	
