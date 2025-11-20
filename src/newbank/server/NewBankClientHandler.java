@@ -41,6 +41,7 @@ public class NewBankClientHandler extends Thread{
 				}
 
 				out.println("Checking Details...");
+
 				// authenticate user and get customer ID token from bank for use in subsequent requests
 				// Check if username exists
 				Customer customerObj = bank.getCustomer(userName);
