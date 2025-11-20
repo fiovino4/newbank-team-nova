@@ -12,6 +12,7 @@ public class NewBankClientHandler extends Thread{
 	private BufferedReader in;
 	private PrintWriter out;
 	
+	
 	public NewBankClientHandler(Socket s) throws IOException {
 		bank = NewBank.getBank();
 		in = new BufferedReader(new InputStreamReader(s.getInputStream()));
@@ -19,62 +20,34 @@ public class NewBankClientHandler extends Thread{
 	}
 	
 	public void run() {
+		// keep getting requests from the client and processing them
 		try {
-			CustomerID customer = null;
-
-			// ===== LOGIN LOOP =====
-			while (customer == null) {
-				// ask for user name
-				out.println("Enter Username");
-				String userName = in.readLine();
-				if (userName == null) {
-					// client disconnected during login
-					return;
-				}
-
-				// ask for password
-				out.println("Enter Password");
-				String password = in.readLine();
-				if (password == null) {
-					// client disconnected during login
-					return;
-				}
-
-				out.println("Checking Details...");
-				// authenticate user and get customer ID token from bank for use in subsequent requests
-				// Check if username exists
-				Customer customerObj = bank.getCustomer(userName);
-				if (customerObj == null) {
-					out.println("Log In Failed");
-					out.println("Username does not exist. Please try again.");
-					continue;  // retry
-				}
-
-				// Check password correctness
-				customer = bank.checkLogInDetails(userName, password);
-				if (customer == null) {
-					out.println("Log In Failed");
-					out.println("Incorrect password. Please try again.");
+			// ask for user name
+			out.println("Enter Username");
+			String userName = in.readLine();
+			// ask for password
+			out.println("Enter Password");
+			String password = in.readLine();
+			out.println("Checking Details...");
+			// authenticate user and get customer ID token from bank for use in subsequent requests
+			CustomerID customer = bank.checkLogInDetails(userName, password);
+			// if the user is authenticated then get requests from the user and process them 
+			if(customer != null) {
+				out.println("Log In Successful. What do you want to do?");
+				while(true) {
+					String request = in.readLine();
+					System.out.println("Request from " + customer.getKey());
+					String responce = bank.processRequest(customer, request);
+					out.println(responce);
 				}
 			}
-
-			// ===== LOGGED-IN SESSION =====
-			//out.println("Log In Successful. What do you want to do?");
-			out.println("Log In Successful. Welcome " + customer.getKey() + "! What do you want to do?");
-			while (true) {
-				String request = in.readLine();
-				if (request == null) {
-					// client disconnected after login
-					break;
-				}
-				System.out.println("Request from " + customer.getKey());
-				String responce = bank.processRequest(customer, request);
-				out.println(responce);
+			else {
+				out.println("Log In Failed");
 			}
-
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
+		}
+		finally {
 			try {
 				in.close();
 				out.close();
@@ -84,4 +57,5 @@ public class NewBankClientHandler extends Thread{
 			}
 		}
 	}
+
 }

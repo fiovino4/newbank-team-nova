@@ -71,19 +71,21 @@ public class ConsoleUI {
         return sb.toString();
     }
 
-    private Thread createServerListenerThread() {
-        return new Thread(() -> {
-            try {
-                while (true) {
-                    String response = connection.receive();
-                    if (response == null) {
-                        break;
-                    }
-                    System.out.println(response);
+private Thread createServerListenerThread() {
+    return new Thread(() -> {
+        try {
+            while (true) {
+                String response = connection.receive();
+                if (response == null) {
+                    System.out.println("Connection closed by server.");
+                    break;
                 }
-            } catch (IOException e) {
-                System.out.println("Disconnected from server."); //Not sure but showing as disconnected
+                System.out.println(response);
             }
-        });
-    }
+        } catch (IOException e) {
+            System.out.println("Disconnected from server due to an error: " + e.getMessage());
+        }
+    });
+}
+
 }
