@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 public class Customer {
 
-	private String password;
-	private ArrayList<Account> accounts;
+	private final String password;
+	private final ArrayList<Account> accounts;
 
 	public Customer(String password) {
         this.password = password;
@@ -17,13 +17,17 @@ public class Customer {
         return password.equals(pw);
     }
 
-	public String accountsToString() {
-		String s = "";
-		for(Account a : accounts) {
-			s += a.toString();
-		}
-		return s;
-	}
+    public String accountsToString() {
+        StringBuilder sb = new StringBuilder();
+        for (Account a : accounts) {
+            if (!sb.isEmpty()) {
+                sb.append("\n");
+            }
+            sb.append("> ").append(a.toString());
+        }
+        return sb.toString();
+    }
+
 
 	public void addAccount(Account account) {
 		accounts.add(account);		
