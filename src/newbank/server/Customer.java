@@ -23,7 +23,7 @@ public class Customer {
             throw new RuntimeException("Error hashing password process", e);
         }
 
-        accounts = new ArrayList<>();
+        this.accounts = new ArrayList<>();
     }
 
 
@@ -35,7 +35,7 @@ public class Customer {
 
 		} catch (Exception e) {
 
-            throw new RuntimeException(e);
+            throw new RuntimeException("Password verification failed", e);
         }
     }
 
