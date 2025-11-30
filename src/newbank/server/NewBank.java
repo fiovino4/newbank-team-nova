@@ -1,14 +1,19 @@
 package newbank.server;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class NewBank {
 
     private static final NewBank bank = new NewBank();
     private final HashMap<String, Customer> customers;
+     // NEW: store loan offers
+    private final List<Loan> loanOffers;
 
     private NewBank() {
         customers = new HashMap<>();
+        loanOffers = new ArrayList<>();
         addTestData();
     }
 
@@ -143,6 +148,108 @@ public synchronized String closeAccount(CustomerID customerID, String accountNam
     }
 
     return "SUCCESS: Account '" + accountName + "' closed.";
+}
+
+public synchronized String offerLoan(CustomerID customerID,
+                                     String fromAccountName,
+                                     double amount,
+                                     double annualRate,
+                                     int termMonths,
+                                     String extraTerms) {
+    Customer customer = customers.get(customerID.getKey());
+    if (customer == null) {
+        return "FAIL: Unknown customer.";
+    }
+
+    if (amount <= 0) {
+        return "FAIL: Loan amount must be positive.";
+    }
+    if (annualRate <= 0) {
+        return "FAIL: Interest rate must be positive.";
+    }
+    if (termMonths <= 0) {
+        return "FAIL: Term must be a positive number of months.";
+    }
+
+    Account from = customer.getAccount(fromAccountName);
+    if (from == null) {
+        return "FAIL: Account '" + fromAccountName + "' not found.";
+    }
+
+    // Optional rule: lender must have at least this much balance
+    if (from.getBalance() < amount) {
+        return "FAIL: Insufficient funds in '" + fromAccountName +
+               "' to offer a loan of " + amount + ".";
+    }
+
+    Loan loan = new Loan(
+            customerID.getKey(),
+            fromAccountName,
+            amount,
+            annualRate,
+            termMonths,
+            extraTerms
+    );
+
+    loanOffers.add(loan);
+
+    return "SUCCESS: Created loan offer #" + loan.getId() +
+           " from account '" + fromAccountName + "'.";
+}
+
+// List all OPEN loan offers in the marketplace
+public synchronized String showAvailableLoans() {
+    if (loanOffers.isEmpty()) {
+        return "No loan offers available.";
+    }
+
+    StringBuilder sb = new StringBuilder();
+    boolean anyOpen = false;
+
+    for (Loan loan : loanOffers) {
+        if ("OPEN".equalsIgnoreCase(loan.getStatus())) {
+            if (!anyOpen) {
+                sb.append("Available loan offers:\n");
+                anyOpen = true;
+            } else {
+                sb.append(System.lineSeparator());
+            }
+            sb.append(loan.toString());
+        }
+    }
+
+    if (!anyOpen) {
+        return "No open loan offers available.";
+    }
+
+    return sb.toString();
+}
+
+// List loan offers created by the current customer
+public synchronized String showMyLoans(CustomerID customerID) {
+    if (customerID == null) {
+        return "FAIL: Not logged in.";
+    }
+
+    String customerName = customerID.getKey();
+    StringBuilder sb = new StringBuilder();
+
+    for (Loan loan : loanOffers) {
+        if (loan.getLenderCustomerName().equalsIgnoreCase(customerName)) {
+            if (sb.length() == 0) {
+                sb.append("Your loan offers:\n");
+            } else {
+                sb.append(System.lineSeparator());
+            }
+            sb.append(loan.toString());
+        }
+    }
+
+    if (sb.length() == 0) {
+        return "You have not created any loan offers.";
+    }
+
+    return sb.toString();
 }
 
 

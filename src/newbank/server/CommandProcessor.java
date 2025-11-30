@@ -34,34 +34,34 @@ public class CommandProcessor {
             case "QUIT":
                 return "Session terminated. Goodbye.";
 
-
             case "SHOWMYACCOUNTS":
                 return bank.showMyAccounts(customer);
 
-            case "CREATEACCOUNT":
+            case "CREATEACCOUNT": {
                 if (args.size() != 1) {
-        return "Usage: CREATEACCOUNT <accountName>";
-    }
+                    return "Usage: CREATEACCOUNT <accountName>";
+                }
 
-    String accountName = args.get(0);
+                String accountName = args.get(0);
+                boolean created = bank.createAccount(customer, accountName);
+                if (created) {
+                    return "SUCCESS: Account '" + accountName + "' created.";
+                } else {
+                    return "FAIL: Could not create account '" + accountName
+                            + "'. It may already exist.";
+                }
+            }
 
-    boolean created = bank.createAccount(customer, accountName);
-    if (created) {
-        return "SUCCESS: Account '" + accountName + "' created.";
-    } else {
-        return "FAIL: Could not create account '" + accountName + "'. " +
-               "It may already exist.";
-    }
-
-            case "CLOSEACCOUNT":
+            case "CLOSEACCOUNT": {
                 if (args.size() != 1) {
                     return "Usage: CLOSEACCOUNT <accountName>";
                 }
 
                 String closeAccountName = args.get(0);
                 return bank.closeAccount(customer, closeAccountName);
+            }
 
-            case "TRANSFER":
+            case "TRANSFER": {
                 if (args.size() != 3) {
                     return "Usage: TRANSFER <fromAccount> <toAccount> <amount>";
                 }
@@ -81,22 +81,67 @@ public class CommandProcessor {
                     return "FAIL: Amount must be positive.";
                 }
 
-                // Hand over to NewBank to do the actual transfer
                 return bank.transfer(customer, fromAccount, toAccount, amount);
+            }
 
-                        // ===== Loans (placeholders) =====
-                        case "OFFERLOAN":
-                        case "REQUESTLOAN":
-                        case "SHOWAVAILABLELOANS":
-                        case "ACCEPTLOAN":
-                        case "MYLOANS":
-                        case "REPAYLOAN":
-                            return name + " not implemented yet on server side.";
-
-                        default:
-                            return "FAIL: Unknown command '" + name + "'. Type HELP for available commands.";
-                    }
+            case "OFFERLOAN": {
+                // Usage: OFFERLOAN <fromAccount> <amount> <annualRate%> <termMonths> [extra terms...]
+                if (args.size() < 4) {
+                    return "Usage: OFFERLOAN <fromAccount> <amount> <annualRate%> <termMonths> [extra terms...]";
                 }
+
+                String fromAccount = args.get(0);
+                String amountStr   = args.get(1);
+                String rateStr     = args.get(2);
+                String termStr     = args.get(3);
+
+                String extraTerms = "";
+                if (args.size() > 4) {
+                    extraTerms = String.join(" ", args.subList(4, args.size()));
+                }
+
+                double amount;
+                double annualRate;
+                int termMonths;
+
+                try {
+                    amount = Double.parseDouble(amountStr);
+                } catch (NumberFormatException e) {
+                    return "FAIL: Amount must be a number.";
+                }
+
+                try {
+                    annualRate = Double.parseDouble(rateStr);
+                } catch (NumberFormatException e) {
+                    return "FAIL: Interest rate must be a number (e.g. 5 or 5.5).";
+                }
+
+                try {
+                    termMonths = Integer.parseInt(termStr);
+                } catch (NumberFormatException e) {
+                    return "FAIL: Term must be an integer number of months.";
+                }
+
+                return bank.offerLoan(customer, fromAccount, amount, annualRate, termMonths, extraTerms);
+            }
+
+            case "REQUESTLOAN":
+            case "SHOWAVAILABLELOANS": {
+                return bank.showAvailableLoans();
+                }
+
+                case "MYLOANS": {
+                    return bank.showMyLoans(customer);
+                }
+                            case "ACCEPTLOAN":
+
+            case "REPAYLOAN":
+                return name + " not implemented yet on server side.";
+
+            default:
+                return "FAIL: Unknown command '" + name + "'. Type HELP for available commands.";
+        }
+    }
 
     private String buildHelpMessage() {
         return String.join("\n",
@@ -106,14 +151,11 @@ public class CommandProcessor {
                 "  CLOSEACCOUNT <accountName>",
                 "  TRANSFER <fromAccount> <toAccount> <amount>",
                 "  VIEWTRANSACTIONS <accountName>",
+                "  OFFERLOAN <fromAccount> <amount> <annualRate%> <termMonths> [extra terms...]",
+                "  SHOWAVAILABLELOANS",
+                "  MYLOANS",
 
-//                "  OFFERLOAN <fromAccount> <amount> <rate> <termMonths>",
-//                "  REQUESTLOAN <toAccount> <amount> <maxRate> <termMonths>",
-//                "  SHOWAVAILABLELOANS",
-//                "  ACCEPTLOAN <loanId> <toAccount>",
-//                "  MYLOANS",
-//                "  REPAYLOAN <loanId> <amount>",
-//                "",
+                // more loan commands later...
                 "  LOGOUT / EXIT / QUIT"
         );
     }
