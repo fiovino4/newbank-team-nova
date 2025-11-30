@@ -57,7 +57,9 @@ public class CommandProcessor {
                 if (args.size() != 1) {
                     return "Usage: CLOSEACCOUNT <accountName>";
                 }
-                return "CLOSEACCOUNT not implemented yet.";
+
+                String closeAccountName = args.get(0);
+                return bank.closeAccount(customer, closeAccountName);
 
             case "TRANSFER":
                 if (args.size() != 3) {

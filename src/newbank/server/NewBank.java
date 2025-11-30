@@ -120,6 +120,30 @@ public synchronized String transfer(CustomerID customerID,
            " from '" + fromAccountName + "' to '" + toAccountName + "'.";
 }
 
+public synchronized String closeAccount(CustomerID customerID, String accountName) {
+    Customer customer = customers.get(customerID.getKey());
+    if (customer == null) {
+        return "FAIL: Unknown customer.";
+    }
+
+    Account account = customer.getAccount(accountName);
+    if (account == null) {
+        return "FAIL: Account '" + accountName + "' not found.";
+    }
+
+    // Simple rule: only allow closing if balance is zero
+    if (account.getBalance() != 0.0) {
+        return "FAIL: Cannot close account '" + accountName +
+               "' because its balance is not zero (" + account.getBalance() + ").";
+    }
+
+    boolean removed = customer.removeAccount(accountName);
+    if (!removed) {
+        return "FAIL: Could not close account '" + accountName + "'.";
+    }
+
+    return "SUCCESS: Account '" + accountName + "' closed.";
+}
 
 
 }
