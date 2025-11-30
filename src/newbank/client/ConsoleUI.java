@@ -6,17 +6,19 @@ import java.io.InputStreamReader;
 
 public class ConsoleUI {
 
-    private final ClientConnection connection;
+    private final NetworkClient connection;
     private final CommandParser parser = new CommandParser();
     private final BufferedReader consoleReader =
             new BufferedReader(new InputStreamReader(System.in));
 
-    public ConsoleUI(ClientConnection connection) {
+    public ConsoleUI(NetworkClient connection) {
         this.connection = connection;
     }
 
     public void start() throws IOException {
 
+
+        while (true) {
         //  NewBankClientHandler handles login part, i did not want to override this just yet
         System.out.println(connection.receive());
         System.out.print("> ");
@@ -33,10 +35,17 @@ public class ConsoleUI {
         String loginResult = connection.receive();
         System.out.println(loginResult);
 
-        if (!loginResult.startsWith("Log In Successful")) {
-            System.out.println("Client closing because login failed.");
-            return;
+        if (loginResult.startsWith("Log In Successful")) {
+            break;
         }
+
+        String extra = connection.receive();
+        if (extra != null && !extra.isBlank()) {
+            System.out.println(extra);
+        }
+
+        }
+
 
         Thread serverListener = createServerListenerThread();
         serverListener.setDaemon(true);

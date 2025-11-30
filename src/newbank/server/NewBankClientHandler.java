@@ -8,12 +8,14 @@ import java.net.Socket;
 
 public class NewBankClientHandler extends Thread{
 	
-	private NewBank bank;
-	private BufferedReader in;
-	private PrintWriter out;
+	private final NewBank bank;
+    private final CommandProcessor commandProcessor;
+	private final BufferedReader in;
+	private final PrintWriter out;
 	
 	public NewBankClientHandler(Socket s) throws IOException {
 		bank = NewBank.getBank();
+        commandProcessor = new CommandProcessor(bank);
 		in = new BufferedReader(new InputStreamReader(s.getInputStream()));
 		out = new PrintWriter(s.getOutputStream(), true);
 	}
@@ -69,20 +71,27 @@ public class NewBankClientHandler extends Thread{
 					break;
 				}
 				System.out.println("Request from " + customer.getKey());
-				String responce = bank.processRequest(customer, request);
-				out.println(responce);
+				String response = commandProcessor.process(customer, request);
+				out.println(response);
+
+                if (response != null && response.startsWith("Session terminated")) {
+                    break;  // LOGOUT/EXIT/QUIT
+                }
 			}
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				in.close();
-				out.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-				Thread.currentThread().interrupt();
-			}
-		}
+        } catch (IOException e) {
+            System.err.println("I/O error in client handler: " + e.getMessage());
+            e.printStackTrace(System.err);
+        } finally {
+            try {
+                in.close();
+                out.close();
+            } catch (IOException e) {
+                System.err.println("Error closing client handler streams: " + e.getMessage());
+                e.printStackTrace(System.err);
+                Thread.currentThread().interrupt();
+            }
+        }
+
 	}
 }

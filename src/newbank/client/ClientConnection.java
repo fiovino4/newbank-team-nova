@@ -2,7 +2,7 @@ package newbank.client;
 
 import java.io.*;
 
-public class ClientConnection {
+public class ClientConnection implements NetworkClient{
 
     private final BufferedReader serverIn;
     private final PrintWriter serverOut;
@@ -13,10 +13,12 @@ public class ClientConnection {
         this.serverOut = new PrintWriter(socket.getOutputStream(), true);
     }
 
+    @Override
     public void send(String message) {
         serverOut.println(message);
     }
 
+    @Override
     public String receive() throws IOException {
         return serverIn.readLine();
     }
