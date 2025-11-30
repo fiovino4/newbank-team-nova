@@ -40,10 +40,18 @@ public class CommandProcessor {
 
             case "CREATEACCOUNT":
                 if (args.size() != 1) {
-                    return "Usage: CREATEACCOUNT <accountName>";
-                }
-                // This needs development
-                return "CREATEACCOUNT not implemented yet.";
+        return "Usage: CREATEACCOUNT <accountName>";
+    }
+
+    String accountName = args.get(0);
+
+    boolean created = bank.createAccount(customer, accountName);
+    if (created) {
+        return "SUCCESS: Account '" + accountName + "' created.";
+    } else {
+        return "FAIL: Could not create account '" + accountName + "'. " +
+               "It may already exist.";
+    }
 
             case "CLOSEACCOUNT":
                 if (args.size() != 1) {
@@ -55,10 +63,10 @@ public class CommandProcessor {
                 if (args.size() != 3) {
                     return "Usage: TRANSFER <fromAccount> <toAccount> <amount>";
                 }
-//                Commented out for now
-//                String from = args.get(0);
-//                String to   = args.get(1);
-                String amountStr = args.get(2);
+
+                String fromAccount = args.get(0);
+                String toAccount   = args.get(1);
+                String amountStr   = args.get(2);
 
                 double amount;
                 try {
@@ -71,22 +79,22 @@ public class CommandProcessor {
                     return "FAIL: Amount must be positive.";
                 }
 
-                // This needs development
-                return "TRANSFER not implemented yet.";
+                // Hand over to NewBank to do the actual transfer
+                return bank.transfer(customer, fromAccount, toAccount, amount);
 
-            // ===== Loans (placeholders) =====
-            case "OFFERLOAN":
-            case "REQUESTLOAN":
-            case "SHOWAVAILABLELOANS":
-            case "ACCEPTLOAN":
-            case "MYLOANS":
-            case "REPAYLOAN":
-                return name + " not implemented yet on server side.";
+                        // ===== Loans (placeholders) =====
+                        case "OFFERLOAN":
+                        case "REQUESTLOAN":
+                        case "SHOWAVAILABLELOANS":
+                        case "ACCEPTLOAN":
+                        case "MYLOANS":
+                        case "REPAYLOAN":
+                            return name + " not implemented yet on server side.";
 
-            default:
-                return "FAIL: Unknown command '" + name + "'. Type HELP for available commands.";
-        }
-    }
+                        default:
+                            return "FAIL: Unknown command '" + name + "'. Type HELP for available commands.";
+                    }
+                }
 
     private String buildHelpMessage() {
         return String.join("\n",

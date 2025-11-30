@@ -69,5 +69,57 @@ public class NewBank {
         return null;
     }
 
+    public synchronized boolean createAccount(CustomerID customerID, String accountName) {
+    Customer customer = customers.get(customerID.getKey());
+    if (customer == null) {
+        return false; // unknown customer
+    }
+
+    // don’t create duplicates
+    if (customer.hasAccount(accountName)) {
+        return false;
+    }
+
+    customer.addAccount(new Account(accountName, 0.0)); // or whatever initial balance
+    return true;
+}
+
+
+public synchronized String transfer(CustomerID customerID,
+                                    String fromAccountName,
+                                    String toAccountName,
+                                    double amount) {
+    Customer customer = customers.get(customerID.getKey());
+    if (customer == null) {
+        return "FAIL: Unknown customer.";
+    }
+
+    if (fromAccountName.equalsIgnoreCase(toAccountName)) {
+        return "FAIL: From and to accounts must be different.";
+    }
+
+    Account from = customer.getAccount(fromAccountName);
+    if (from == null) {
+        return "FAIL: From-account '" + fromAccountName + "' not found.";
+    }
+
+    Account to = customer.getAccount(toAccountName);
+    if (to == null) {
+        return "FAIL: To-account '" + toAccountName + "' not found.";
+    }
+
+    if (from.getBalance() < amount) {
+        return "FAIL: Insufficient funds in '" + fromAccountName + "'.";
+    }
+
+    // do the transfer
+    from.setBalance(from.getBalance() - amount);
+    to.setBalance(to.getBalance() + amount);
+
+    return "SUCCESS: Transferred " + amount +
+           " from '" + fromAccountName + "' to '" + toAccountName + "'.";
+}
+
+
 
 }

@@ -20,7 +20,8 @@ public class Customer {
     public String accountsToString() {
         StringBuilder sb = new StringBuilder();
         for (Account a : accounts) {
-            if (!sb.isEmpty()) {
+            if (sb.length() > 0) {
+            /*if (!sb.isEmpty()) {*/ /*removed this part */
                 sb.append("\n");
             }
             sb.append("> ").append(a.toString());
@@ -32,4 +33,24 @@ public class Customer {
 	public void addAccount(Account account) {
 		accounts.add(account);		
 	}
+
+public boolean hasAccount(String accountName) {
+    for (Account a : accounts) {
+        if (a.getAccountName().equalsIgnoreCase(accountName)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+public Account getAccount(String accountName) {
+    for (Account a : accounts) {
+        if (a.getAccountName().equalsIgnoreCase(accountName)) {
+            return a;
+        }
+    }
+    return null;
+}
+
+
 }
