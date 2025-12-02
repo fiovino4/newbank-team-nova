@@ -71,10 +71,6 @@ src/
 
 # ⭐ Adding a New Command
 
-
-
-
-
 You must update **four layers**:
 
 ```
@@ -94,27 +90,37 @@ File: `src/newbank/client/CommandParser.java`
 This ensures the command name and argument count are valid.
 
 ```java
-    private int expectedArgumentCount(String name) {
+private int expectedArgumentCount(String name) {
     switch (name) {
         // General / existing commands
         case "HELP": return 0;
         case "SHOWMYACCOUNTS": return 0;
+        // add other commands here...
+        default: return -1;
+    }
+}
 
+private String usageFor(String name) {
+    switch (name) {
+        case "HELP":
+            return "HELP";
+        case "SHOWMYACCOUNTS":
+            return "SHOWMYACCOUNTS";
+        // add other commands here...
+        default:
+            return "";
+    }
+}
 
-        private String usageFor(String name) {
-            switch (name) {
-                case "HELP":
-                    return "HELP";
-                case "SHOWMYACCOUNTS":
-                    return "SHOWMYACCOUNTS";
-
-
-                private String buildHelpMessage() {
-                    return String.join("\n",
-                            "Available commands:",
-                            "  SHOWMYACCOUNTS",
-                            "  BALANCE",
-                            "  CREATEACCOUNT <accountName>",
+private String buildHelpMessage() {
+    return String.join("\n",
+            "Available commands:",
+            "  SHOWMYACCOUNTS",
+            "  BALANCE",
+            "  CREATEACCOUNT <accountName>"
+            // etc...
+    );
+}
 ```
 
 ---
@@ -122,7 +128,7 @@ This ensures the command name and argument count are valid.
 # 2️⃣ Client - ConsoleUI (Interactive Mode)
 File: `src/newbank/client/ConsoleUI.java`
 
-If the user types only `CREATEACCOUNT`, the UI triggers a multi‑step flow:
+If the user types only `CREATEACCOUNT`, the UI triggers a multi-step flow:
 
 ### (A) The interactive builder
 
@@ -218,8 +224,6 @@ Recommended tests:
 
 ## 2️⃣ Push your branch
 
-
-
 ## 3️⃣ Open a PR into `develop`
 
 Your PR description must include:
@@ -240,4 +244,3 @@ Each PR must add entries under:
 ### Changed
 ### Fixed
 ```
-
