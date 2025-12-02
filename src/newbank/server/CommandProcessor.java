@@ -1,5 +1,7 @@
 package newbank.server;
 
+import newbank.server.loan.Loan;
+
 import java.util.List;
 import java.util.Arrays;
 
@@ -76,6 +78,32 @@ public class CommandProcessor {
 
             // ===== Loans (placeholders) =====
             case "OFFERLOAN":
+
+                if(args.size() !=4){
+
+                    return "Usage: OFFERLOAN <fromAccount> <amount> <rate> <termMonths>";
+                }
+
+                try {
+
+                    String fromAcc = args.get(0);
+                    double amountLoan = Double.parseDouble(args.get(1));
+                    double rate = Double.parseDouble(args.get(2));
+                    int months = Integer.parseInt(args.get(3));
+
+                    Loan loan = bank.getLoanService().offerLoan(customer, fromAcc, amountLoan, rate, months, "");
+
+                    return "SUCCESS: Loan created with ID " + loan.getId();
+
+                }catch (NumberFormatException e){
+
+                    return "FAIL: amount or rate or termMonths must be numeric.";
+                }catch (IllegalArgumentException e){
+
+                    return "FAIL: " + e.getMessage();
+                }
+
+
             case "REQUESTLOAN":
             case "SHOWAVAILABLELOANS":
             case "ACCEPTLOAN":

@@ -54,4 +54,13 @@ public class Customer {
 	public void addAccount(Account account) {
 		accounts.add(account);		
 	}
+
+	public Account getAccountByName(String name) {
+		for (Account a : accounts) {
+			if (a.getAccountByName().equalsIgnoreCase(name)) {
+				return a;
+			}
+		}
+		return null;
+	}
 }
