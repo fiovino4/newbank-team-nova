@@ -125,18 +125,6 @@ public class ConsoleUI {
         return sb.toString();
     }
 
-
-     // Helper to prompt for a single field with a consistent style and format hint.
-
-    private String promptFor(String label, String formatHint) throws IOException {
-        System.out.println("Enter " + label + " (" + formatHint + "):");
-        System.out.print("> ");
-        return consoleReader.readLine();
-    }
-
-    //Helper to prompt for a field where the user can type EXIT to cancel.
-     // Returns null if the user cancels.
-
     private String promptForOrExit(String label, String formatHint) throws IOException {
         System.out.println("Enter " + label + " (" + formatHint + ", or type EXIT to cancel):");
         System.out.print("> ");
