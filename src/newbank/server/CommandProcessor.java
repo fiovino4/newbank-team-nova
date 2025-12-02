@@ -4,6 +4,7 @@ import newbank.server.loan.Loan;
 
 import java.util.List;
 import java.util.Arrays;
+import newbank.server.notification.Notification;
 
 public class CommandProcessor {
 
@@ -91,6 +92,7 @@ public class CommandProcessor {
                     double rate = Double.parseDouble(args.get(2));
                     int months = Integer.parseInt(args.get(3));
 
+                    //mock extra terms
                     Loan loan = bank.getLoanService().offerLoan(customer, fromAcc, amountLoan, rate, months, "");
 
                     return "SUCCESS: Loan created with ID " + loan.getId();
@@ -105,6 +107,39 @@ public class CommandProcessor {
 
 
             case "REQUESTLOAN":
+
+                if(args.size() != 1){
+                    return "Usage: REQUESTLOAN <loanId>";
+                }
+
+                try {
+                    int requestedLoanId = Integer.parseInt(args.get(0));
+                    Loan loan = bank.getLoanService().requestLoan(customer, requestedLoanId);
+
+                    return "SUCCESS: Loan " + loan.getId() + " has been successfully requested.";
+
+                }catch (IllegalArgumentException e){
+
+                    return "FAIL: " + e.getMessage();
+                }
+
+
+            case "SHOWNOTIFICATIONS": {
+                List<Notification> notifications = bank.getNotificationService().getNotifications(customer);
+
+                if (notifications.isEmpty()) {
+                    return "You have no notifications.";
+                }
+
+                StringBuilder sb = new StringBuilder("Your notifications:\n");
+                for (Notification n : notifications) {
+                    sb.append("  [").append(n.getId()).append("] ")
+                            .append(n.getMessage()).append(" (").append(n.isRead() ? "read" : "unread")
+                            .append(")\n");
+                }
+                return sb.toString().trim();
+            }
+
             case "SHOWAVAILABLELOANS":
             case "ACCEPTLOAN":
             case "MYLOANS":

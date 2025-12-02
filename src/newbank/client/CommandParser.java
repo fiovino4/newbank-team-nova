@@ -45,11 +45,14 @@ public class CommandParser {
 
             // Loan commands
             case "OFFERLOAN": return 4;           // OFFERLOAN <fromAcc> <amount> <rate> <termMonths>
-            case "REQUESTLOAN": return 4;         // REQUESTLOAN <toAcc> <amount> <maxRate> <termMonths>
+            case "REQUESTLOAN": return 1;         // REQUESTLOAN <toAcc> <amount> <maxRate> <termMonths>
             case "SHOWAVAILABLELOANS": return 0;  // SHOWAVAILABLELOANS
             case "ACCEPTLOAN": return 2;          // ACCEPTLOAN <loanId> <toAcc>
             case "MYLOANS": return 0;             // MYLOANS
             case "REPAYLOAN": return 2;           // REPAYLOAN <loanId> <amount>
+
+            //NOTIFICATION
+            case "SHOWNOTIFICATIONS": return 0;
 
             default:
                 // Unknown commands maybe handled server-side?
@@ -74,7 +77,7 @@ public class CommandParser {
             case "OFFERLOAN":
                 return "OFFERLOAN <fromAccount> <amount> <rate> <termMonths>";
             case "REQUESTLOAN":
-                return "REQUESTLOAN <toAccount> <amount> <maxRate> <termMonths>";
+                return "REQUESTLOAN <loanId>";
             case "SHOWAVAILABLELOANS":
                 return "SHOWAVAILABLELOANS";
             case "ACCEPTLOAN":
@@ -83,6 +86,9 @@ public class CommandParser {
                 return "MYLOANS";
             case "REPAYLOAN":
                 return "REPAYLOAN <loanId> <amount>";
+            case "SHOWNOTIFICATIONS":
+                return "SHOWNOTIFICATIONS";
+
             default:
                 return "";
         }

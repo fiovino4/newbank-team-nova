@@ -4,6 +4,7 @@ import newbank.server.Account;
 import newbank.server.Customer;
 import newbank.server.CustomerID;
 import newbank.server.NewBank;
+import newbank.server.notification.Notification;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +41,6 @@ public class LoanService {
         this.newBank = bank;
     }
 
-
     /**
      * Creates a new loan offered by a customer and registers it within the loan store.
      *
@@ -52,7 +52,7 @@ public class LoanService {
      *   Validates that interest rate and term are positive
      *
      * On successful validation, a new {@link Loan} is created with a unique ID and an
-     * initial status of {@link LoanStatus#ACTIVE}. The loan is inserted into the service's
+     * initial status of {@link LoanStatus#AVAILABLE}. The loan is inserted into the service's
      * internal store and returned to the caller.
      *
      *
@@ -79,7 +79,7 @@ public class LoanService {
         Customer lender = newBank.getCustomer(lenderId.getKey());
 
         if (lender == null){
-            throw new IllegalArgumentException("Unknow lender");
+            throw new IllegalArgumentException("Unknown lender");
         }
 
         Account account = lender.getAccountByName(fromAccount);
@@ -110,7 +110,7 @@ public class LoanService {
          */
 
         int id = nextLoanId.getAndIncrement();
-        Loan loan = new Loan(id, lenderId, fromAccount, amount, interestRate, termMonths, extraTerms, LoanStatus.ACTIVE);
+        Loan loan = new Loan(id, lenderId, fromAccount, amount, interestRate, termMonths, extraTerms, LoanStatus.AVAILABLE);
 
         loans.put(id, loan);
 
@@ -118,6 +118,63 @@ public class LoanService {
     }
 
     /**
-     * TODO: other loan service as listAvailableLoans or requestLoan or acceptLoan
-     **/
+     * Processes a request from a borrower to request an existing loan.
+     *
+     * This method verifies that:
+     *  - The borrower exists in the system
+     *  - The loan ID refers to a valid loan
+     *  - The loan is currently in AVAILABLE status
+     *  - The lender referenced by the loan exists
+     *
+     * If all conditions are met, the loan status is changed to REQUESTED and a
+     * notification is created for the lender informing them of the request.
+     *
+     *  @param:
+     *  borrowerId - the customer who is requesting the loan
+     *  loanId     - the identifier of the loan being requested
+     *
+     * @return :
+     *  the updated Loan object with status set to REQUESTED
+     *
+     * @throws :
+     *  IllegalArgumentException if the borrower does not exist,
+     *                           if the loan does not exist,
+     *                           or if the loan is not in AVAILABLE status
+     *  IllegalStateException    if the loan references a lender that does not exist
+     *
+     * The method is synchronized to ensure thread safety when modifying loan
+     * status and generating notifications.
+     */
+    public synchronized Loan requestLoan(CustomerID borrowerId, int loanId){
+
+        Customer borrower = newBank.getCustomer(borrowerId.getKey());
+        Loan requestedLoan = loans.get(loanId);
+
+        if (borrower == null){
+            throw new IllegalArgumentException("Unknown borrower");
+        }
+
+        if(!loans.containsKey(loanId)){
+            throw new IllegalArgumentException("The loan id does not exist in the loan list");
+        }
+
+        if(requestedLoan.getLoanStatus().equals(LoanStatus.AVAILABLE)){
+
+            requestedLoan.setLoanStatus(LoanStatus.REQUESTED);
+
+            CustomerID lenderId = requestedLoan.getLender();
+            Customer lender = newBank.getCustomer(lenderId.getKey());
+
+            if (lender == null) {
+                throw new IllegalStateException("Loan references a non-existent lender.");
+            }
+
+            Notification notification = newBank.getNotificationService().createNotification(lenderId,"Borrower " + borrowerId.getKey() +" has requested your loan " + loanId + ".");
+
+        }else{
+            throw new IllegalArgumentException("The loan is not in the AVAILABLE status");
+        }
+
+        return  requestedLoan;
+    }
  }
