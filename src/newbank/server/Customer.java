@@ -39,13 +39,17 @@ public class Customer {
         }
     }
 
-	public String accountsToString() {
-		String s = "";
-		for(Account a : accounts) {
-			s += a.toString();
-		}
-		return s;
-	}
+    public String accountsToString() {
+        StringBuilder sb = new StringBuilder();
+        for (Account a : accounts) {
+            if (!sb.isEmpty()) {
+                sb.append("\n");
+            }
+            sb.append("> ").append(a.toString());
+        }
+        return sb.toString();
+    }
+
 
 	public void addAccount(Account account) {
 		accounts.add(account);		

@@ -17,6 +17,8 @@ public class ConsoleUI {
 
     public void start() throws IOException {
 
+
+        while (true) {
         //  NewBankClientHandler handles login part, i did not want to override this just yet
         System.out.println(connection.receive());
         System.out.print("> ");
@@ -33,10 +35,17 @@ public class ConsoleUI {
         String loginResult = connection.receive();
         System.out.println(loginResult);
 
-        if (!loginResult.startsWith("Log In Successful")) {
-            System.out.println("Client closing because login failed.");
-            return;
+        if (loginResult.startsWith("Log In Successful")) {
+            break;
         }
+
+        String extra = connection.receive();
+        if (extra != null && !extra.isBlank()) {
+            System.out.println(extra);
+        }
+
+        }
+
 
         Thread serverListener = createServerListenerThread();
         serverListener.setDaemon(true);
