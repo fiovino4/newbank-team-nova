@@ -34,9 +34,11 @@ public class CommandProcessor {
             case "QUIT":
                 return "Session terminated. Goodbye.";
 
-
             case "SHOWMYACCOUNTS":
-                return bank.showMyAccounts(customer);
+            case "BALANCE":
+            case "BALANCES":
+                // BALANCE/BALANCES are aliases for SHOWMYACCOUNTS
+                return bank.showMyAccounts(customer) + "\nEND_OF_ACCOUNTS";
 
             case "CREATEACCOUNT":
                 if (args.size() != 1) {
@@ -55,9 +57,8 @@ public class CommandProcessor {
                 if (args.size() != 3) {
                     return "Usage: TRANSFER <fromAccount> <toAccount> <amount>";
                 }
-//                Commented out for now
-//                String from = args.get(0);
-//                String to   = args.get(1);
+
+                // For now we validate the numeric amount
                 String amountStr = args.get(2);
 
                 double amount;
@@ -84,27 +85,33 @@ public class CommandProcessor {
                 return name + " not implemented yet on server side.";
 
             default:
-                return "FAIL: Unknown command '" + name + "'. Type HELP for available commands.";
+                // Should normally be caught client-side by CommandParser, but we
+                // keep a clear message here as a safety net.
+                return "Unknown command '" + name + "'. Type HELP for a list of commands.";
         }
     }
 
     private String buildHelpMessage() {
         return String.join("\n",
                 "Available commands:",
+                "  You can either:",
+                "    - Type the full command with arguments, e.g. TRANSFER Main Savings 100.00",
+                "    - Or type just the command name (e.g. TRANSFER, CREATEACCOUNT) and follow the prompts.",
+                "",
                 "  SHOWMYACCOUNTS",
+                "  BALANCE",
                 "  CREATEACCOUNT <accountName>",
                 "  CLOSEACCOUNT <accountName>",
                 "  TRANSFER <fromAccount> <toAccount> <amount>",
                 "  VIEWTRANSACTIONS <accountName>",
-
-//                "  OFFERLOAN <fromAccount> <amount> <rate> <termMonths>",
-//                "  REQUESTLOAN <toAccount> <amount> <maxRate> <termMonths>",
-//                "  SHOWAVAILABLELOANS",
-//                "  ACCEPTLOAN <loanId> <toAccount>",
-//                "  MYLOANS",
-//                "  REPAYLOAN <loanId> <amount>",
-//                "",
-                "  LOGOUT / EXIT / QUIT"
+                "  OFFERLOAN <fromAccount> <amount> <rate> <termMonths>",
+                "  REQUESTLOAN <toAccount> <amount> <maxRate> <termMonths>",
+                "  SHOWAVAILABLELOANS",
+                "  ACCEPTLOAN <loanId> <toAccount>",
+                "  MYLOANS",
+                "  REPAYLOAN <loanId> <amount>",
+                "  LOGOUT / EXIT / QUIT",
+                "END_OF_HELP"
         );
     }
 }

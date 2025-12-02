@@ -23,6 +23,11 @@ public class CommandParser {
 
         // Validate argument count for known commands
         int expected = expectedArgumentCount(name);
+        if (expected == -1) {
+            // Unknown command at client side
+            return ParsedCommand.invalid(
+                    "Unknown command '" + name + "'. Type HELP for a list of commands.");
+        }
         if (expected >= 0 && args.size() != expected) {
             String usage = usageFor(name);
             String message = "Invalid number of arguments for " + name + "."
@@ -38,21 +43,23 @@ public class CommandParser {
             // General / existing commands
             case "HELP": return 0;
             case "SHOWMYACCOUNTS": return 0;
-            case "CREATEACCOUNT": return 1;       // CREATEACCOUNT <accountName>
-            case "CLOSEACCOUNT": return 1;        // CLOSEACCOUNT <accountName>
-            case "TRANSFER": return 3;            // TRANSFER <from> <to> <amount>
-            case "VIEWTRANSACTIONS": return 1;    // VIEWTRANSACTIONS <accountName>
+            case "BALANCE":
+            case "BALANCES":
+                return 0;                           // BALANCE/BALANCES/SHOWMYACCOUNTS
+            case "CREATEACCOUNT": return 1;        // CREATEACCOUNT <accountName>
+            case "CLOSEACCOUNT": return 1;         // CLOSEACCOUNT <accountName>
+            case "TRANSFER": return 3;             // TRANSFER <from> <to> <amount>
+            case "VIEWTRANSACTIONS": return 1;     // VIEWTRANSACTIONS <accountName>
 
             // Loan commands
-            case "OFFERLOAN": return 4;           // OFFERLOAN <fromAcc> <amount> <rate> <termMonths>
-            case "REQUESTLOAN": return 4;         // REQUESTLOAN <toAcc> <amount> <maxRate> <termMonths>
-            case "SHOWAVAILABLELOANS": return 0;  // SHOWAVAILABLELOANS
-            case "ACCEPTLOAN": return 2;          // ACCEPTLOAN <loanId> <toAcc>
-            case "MYLOANS": return 0;             // MYLOANS
-            case "REPAYLOAN": return 2;           // REPAYLOAN <loanId> <amount>
+            case "OFFERLOAN": return 4;            // OFFERLOAN <fromAcc> <amount> <rate> <termMonths>
+            case "REQUESTLOAN": return 4;          // REQUESTLOAN <toAcc> <amount> <maxRate> <termMonths>
+            case "SHOWAVAILABLELOANS": return 0;   // SHOWAVAILABLELOANS
+            case "ACCEPTLOAN": return 2;           // ACCEPTLOAN <loanId> <toAcc>
+            case "MYLOANS": return 0;              // MYLOANS
+            case "REPAYLOAN": return 2;            // REPAYLOAN <loanId> <amount>
 
             default:
-                // Unknown commands maybe handled server-side?
                 return -1;
         }
     }
@@ -63,6 +70,8 @@ public class CommandParser {
                 return "HELP";
             case "SHOWMYACCOUNTS":
                 return "SHOWMYACCOUNTS";
+            case "BALANCE":
+                return "BALANCE";
             case "CREATEACCOUNT":
                 return "CREATEACCOUNT <accountName>";
             case "CLOSEACCOUNT":
@@ -86,5 +95,24 @@ public class CommandParser {
             default:
                 return "";
         }
+    }
+    private String buildHelpMessage() {
+        return String.join("\n",
+                "Available commands:",
+                "  SHOWMYACCOUNTS",
+                "  BALANCE",
+                "  CREATEACCOUNT <accountName>",
+                "  CLOSEACCOUNT <accountName>",
+                "  TRANSFER <fromAccount> <toAccount> <amount>",
+                "  VIEWTRANSACTIONS <accountName>",
+                "  OFFERLOAN <fromAccount> <amount> <rate> <termMonths>",
+                "  REQUESTLOAN <toAccount> <amount> <maxRate> <termMonths>",
+                "  SHOWAVAILABLELOANS",
+                "  ACCEPTLOAN <loanId> <toAccount>",
+                "  MYLOANS",
+                "  REPAYLOAN <loanId> <amount>",
+                "  LOGOUT / EXIT / QUIT",
+                "END_OF_HELP"
+        );
     }
 }
