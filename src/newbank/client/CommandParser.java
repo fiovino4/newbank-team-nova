@@ -42,6 +42,7 @@ public class CommandParser {
             case "HELP" -> 0;
             case "SHOWMYACCOUNTS" -> 0;
             case "BALANCE", "BALANCES" -> 0; // aliases for SHOWMYACCOUNTS
+            case "LOGOUT", "EXIT", "QUIT" -> 0;
             case "CREATEACCOUNT" -> 1;       // CREATEACCOUNT <accountName>
             case "CLOSEACCOUNT" -> 1;        // CLOSEACCOUNT <accountName>
             case "TRANSFER" -> 3;            // TRANSFER <from> <to> <amount>
@@ -64,6 +65,7 @@ public class CommandParser {
             case "HELP" -> "HELP";
             case "SHOWMYACCOUNTS" -> "SHOWMYACCOUNTS";
             case "BALANCE" -> "BALANCE";
+            case "LOGOUT", "EXIT", "QUIT" -> "LOGOUT / EXIT / QUIT";
             case "CREATEACCOUNT" -> "CREATEACCOUNT <accountName>";
             case "CLOSEACCOUNT" -> "CLOSEACCOUNT <accountName>";
             case "TRANSFER" -> "TRANSFER <fromAccount> <toAccount> <amount>";

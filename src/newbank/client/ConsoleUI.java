@@ -91,7 +91,10 @@ public class ConsoleUI {
 
             // Special handling for HELP which returns multiple lines.
             if ("HELP".equals(cmd.getName())) {
-                readMultilineResponseUntilEndMarker("END_OF_HELP");
+               boolean ok =  readMultilineResponseUntilEndMarker("END_OF_HELP");
+               if(!ok){
+                   break;
+               }
                 continue;
             }
 
@@ -99,16 +102,27 @@ public class ConsoleUI {
             if ("SHOWMYACCOUNTS".equals(cmd.getName())
                     || "BALANCE".equals(cmd.getName())
                     || "BALANCES".equals(cmd.getName())) {
-                readMultilineResponseUntilEndMarker("END_OF_ACCOUNTS");
+                boolean ok = readMultilineResponseUntilEndMarker("END_OF_ACCOUNTS");
+                if(!ok){
+                    break;
+                }
                 continue;
             }
 
             // Default: single-line response
-            String response = connection.receive();
+            String response;
+            try {
+                response = connection.receive();
+            } catch (IOException e) {
+                System.out.println("Connection closed by server.");
+                break;
+            }
+
             if (response == null) {
                 System.out.println("Connection closed by server.");
                 break;
             }
+
             System.out.println(response);
 
             if (response.startsWith("Session terminated")) {
@@ -273,17 +287,22 @@ public class ConsoleUI {
         return "CREATEACCOUNT " + trimmedName;
     }
 
-    private void readMultilineResponseUntilEndMarker(String endMarker) throws IOException {
-        while (true) {
-            String line = connection.receive();
-            if (line == null) {
-                System.out.println("Connection closed by server.");
-                break;
+    private boolean readMultilineResponseUntilEndMarker(String endMarker) {
+        try {
+            while (true) {
+                String line = connection.receive();
+                if (line == null) {
+                    System.out.println("Connection closed by server.");
+                    return false;   // signal: server disconnected
+                }
+                if (line.equals(endMarker)) {
+                    return true;    // signal: finished reading normally
+                }
+                System.out.println(line);
             }
-            if (line.equals(endMarker)) {
-                break;
-            }
-            System.out.println(line);
+        } catch (IOException e) {
+            System.out.println("Connection closed by server.");
+            return false;           // signal: server disconnected due to error
         }
     }
 }
