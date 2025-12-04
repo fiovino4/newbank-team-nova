@@ -95,6 +95,6 @@ public class NewBankClientHandler extends Thread {
                 e.printStackTrace(System.err);
                 Thread.currentThread().interrupt();
             }
-        }
-    }
-}
+        }  // end try
+    }      // end run
+}          // end class

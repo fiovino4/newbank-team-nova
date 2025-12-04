@@ -1,48 +1,27 @@
 package newbank.server;
 
-import newbank.server.security.PasswordManagerService;
 import java.util.ArrayList;
 
 public class Customer {
 
+	private final String password;
 	private final ArrayList<Account> accounts;
-	private final String passwordHash;
-	private final String passwordSalt;
 
-	public Customer(String userInputPassword) {
-
-		try {
-			PasswordManagerService.HashResult result = PasswordManagerService.hashPassword(userInputPassword);
-
-			this.passwordHash = result.hash;
-			this.passwordSalt = result.salt;
-
-			//System.out.println("this is the pass stored" + passwordHash + " " + passwordSalt);
-
-		} catch (Exception e) {
-            throw new RuntimeException("Error hashing password process", e);
-        }
-
-        this.accounts = new ArrayList<>();
+	public Customer(String password) {
+        this.password = password;
+        accounts = new ArrayList<>();
     }
+	
 
-
-	public boolean checkPassword(String passwordToCheck){
-
-		try {
-			//use the new verify method
-			return PasswordManagerService.verify(passwordToCheck, passwordHash, passwordSalt);
-
-		} catch (Exception e) {
-
-            throw new RuntimeException("Password verification failed", e);
-        }
+	public boolean checkPassword(String pw) {
+        return password.equals(pw);
     }
 
     public String accountsToString() {
         StringBuilder sb = new StringBuilder();
         for (Account a : accounts) {
-            if (!sb.isEmpty()) {
+            if (sb.length() > 0) {
+            /*if (!sb.isEmpty()) {*/ /*removed this part */
                 sb.append("\n");
             }
             sb.append("> ").append(a.toString());
@@ -54,4 +33,35 @@ public class Customer {
 	public void addAccount(Account account) {
 		accounts.add(account);		
 	}
+
+public boolean hasAccount(String accountName) {
+    for (Account a : accounts) {
+        if (a.getAccountName().equalsIgnoreCase(accountName)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+public Account getAccount(String accountName) {
+    for (Account a : accounts) {
+        if (a.getAccountName().equalsIgnoreCase(accountName)) {
+            return a;
+        }
+    }
+    return null;
+}
+
+public boolean removeAccount(String accountName) {
+    for (int i = 0; i < accounts.size(); i++) {
+        Account a = accounts.get(i);
+        if (a.getAccountName().equalsIgnoreCase(accountName)) {
+            accounts.remove(i);
+            return true;
+        }
+    }
+    return false;
+}
+
+
 }

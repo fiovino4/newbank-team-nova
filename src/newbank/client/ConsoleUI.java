@@ -6,12 +6,12 @@ import java.io.InputStreamReader;
 
 public class ConsoleUI {
 
-    private final ClientConnection connection;
+    private final NetworkClient connection;
     private final CommandParser parser = new CommandParser();
     private final BufferedReader consoleReader =
             new BufferedReader(new InputStreamReader(System.in));
 
-    public ConsoleUI(ClientConnection connection) {
+    public ConsoleUI(NetworkClient connection) {
         this.connection = connection;
     }
 

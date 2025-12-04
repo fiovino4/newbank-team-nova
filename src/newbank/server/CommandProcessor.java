@@ -40,26 +40,38 @@ public class CommandProcessor {
                 // BALANCE/BALANCES are aliases for SHOWMYACCOUNTS
                 return bank.showMyAccounts(customer) + "\nEND_OF_ACCOUNTS";
 
-            case "CREATEACCOUNT":
+            case "CREATEACCOUNT": {
                 if (args.size() != 1) {
                     return "Usage: CREATEACCOUNT <accountName>";
                 }
-                // This needs development
-                return "CREATEACCOUNT not implemented yet.";
 
-            case "CLOSEACCOUNT":
+                String accountName = args.get(0);
+                boolean created = bank.createAccount(customer, accountName);
+                if (created) {
+                    return "SUCCESS: Account '" + accountName + "' created.";
+                } else {
+                    return "FAIL: Could not create account '" + accountName
+                            + "'. It may already exist.";
+                }
+            }
+
+            case "CLOSEACCOUNT": {
                 if (args.size() != 1) {
                     return "Usage: CLOSEACCOUNT <accountName>";
                 }
-                return "CLOSEACCOUNT not implemented yet.";
 
-            case "TRANSFER":
+                String closeAccountName = args.get(0);
+                return bank.closeAccount(customer, closeAccountName);
+            }
+
+            case "TRANSFER": {
                 if (args.size() != 3) {
                     return "Usage: TRANSFER <fromAccount> <toAccount> <amount>";
                 }
 
-                // For now we validate the numeric amount
-                String amountStr = args.get(2);
+                String fromAccount = args.get(0);
+                String toAccount   = args.get(1);
+                String amountStr   = args.get(2);
 
                 double amount;
                 try {
@@ -72,22 +84,66 @@ public class CommandProcessor {
                     return "FAIL: Amount must be positive.";
                 }
 
-                // This needs development
-                return "TRANSFER not implemented yet.";
+                return bank.transfer(customer, fromAccount, toAccount, amount);
+            }
 
-            // ===== Loans (placeholders) =====
-            case "OFFERLOAN":
-            case "REQUESTLOAN":
-            case "SHOWAVAILABLELOANS":
+            case "OFFERLOAN": {
+                // Usage: OFFERLOAN <fromAccount> <amount> <annualRate%> <termMonths> [extra terms...]
+                if (args.size() < 4) {
+                    return "Usage: OFFERLOAN <fromAccount> <amount> <annualRate%> <termMonths> [extra terms...]";
+                }
+
+                String fromAccount = args.get(0);
+                String amountStr   = args.get(1);
+                String rateStr     = args.get(2);
+                String termStr     = args.get(3);
+
+                String extraTerms = "";
+                if (args.size() > 4) {
+                    extraTerms = String.join(" ", args.subList(4, args.size()));
+                }
+
+                double amount;
+                double annualRate;
+                int termMonths;
+
+                try {
+                    amount = Double.parseDouble(amountStr);
+                } catch (NumberFormatException e) {
+                    return "FAIL: Amount must be a number.";
+                }
+
+                try {
+                    annualRate = Double.parseDouble(rateStr);
+                } catch (NumberFormatException e) {
+                    return "FAIL: Interest rate must be a number (e.g. 5 or 5.5).";
+                }
+
+                try {
+                    termMonths = Integer.parseInt(termStr);
+                } catch (NumberFormatException e) {
+                    return "FAIL: Term must be an integer number of months.";
+                }
+
+                return bank.offerLoan(customer, fromAccount, amount, annualRate, termMonths, extraTerms);
+            }
+
+           case "REQUESTLOAN":
+               return "REQUESTLOAN not implemented yet on server side.";
+            
+            case "SHOWAVAILABLELOANS": 
+                return bank.showAvailableLoans();
+
+             case "MYLOANS":
+                return bank.showMyLoans(customer);
+                
+            
             case "ACCEPTLOAN":
-            case "MYLOANS":
             case "REPAYLOAN":
                 return name + " not implemented yet on server side.";
 
             default:
-                // Should normally be caught client-side by CommandParser, but we
-                // keep a clear message here as a safety net.
-                return "Unknown command '" + name + "'. Type HELP for a list of commands.";
+                return "FAIL: Unknown command '" + name + "'. Type HELP for available commands.";
         }
     }
 
@@ -104,7 +160,7 @@ public class CommandProcessor {
                 "  CLOSEACCOUNT <accountName>",
                 "  TRANSFER <fromAccount> <toAccount> <amount>",
                 "  VIEWTRANSACTIONS <accountName>",
-                "  OFFERLOAN <fromAccount> <amount> <rate> <termMonths>",
+                "  OFFERLOAN <fromAccount> <amount> <annualRate%> <termMonths> [extra terms...]",
                 "  REQUESTLOAN <toAccount> <amount> <maxRate> <termMonths>",
                 "  SHOWAVAILABLELOANS",
                 "  ACCEPTLOAN <loanId> <toAccount>",
