@@ -29,15 +29,12 @@ public class NewBank {
         Customer john = new Customer("pass");
         john.addAccount(new Account("Checking", 250.0));
         customers.put("John", john);
-
-
+      
         Customer test = new Customer("Test");
         test.addAccount(new Account("Main", 1000.0));
         test.addAccount(new Account("Savings", 1000.0));
         test.addAccount(new Account("Bonds", 1000.0));
         customers.put("Test", test);
-
-
     }
 
     public static NewBank getBank() {
@@ -51,8 +48,7 @@ public class NewBank {
     public boolean hasCustomer(CustomerID customerID) {
         return customers.containsKey(customerID.getKey());
     }
-
-
+  
     public String showMyAccounts(CustomerID customerID) {
         Customer c = customers.get(customerID.getKey());
         if (c == null) {
@@ -251,6 +247,5 @@ public synchronized String showMyLoans(CustomerID customerID) {
 
     return sb.toString();
 }
-
 
 }

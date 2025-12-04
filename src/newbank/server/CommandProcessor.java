@@ -35,7 +35,10 @@ public class CommandProcessor {
                 return "Session terminated. Goodbye.";
 
             case "SHOWMYACCOUNTS":
-                return bank.showMyAccounts(customer);
+            case "BALANCE":
+            case "BALANCES":
+                // BALANCE/BALANCES are aliases for SHOWMYACCOUNTS
+                return bank.showMyAccounts(customer) + "\nEND_OF_ACCOUNTS";
 
             case "CREATEACCOUNT": {
                 if (args.size() != 1) {
@@ -125,16 +128,17 @@ public class CommandProcessor {
                 return bank.offerLoan(customer, fromAccount, amount, annualRate, termMonths, extraTerms);
             }
 
-            case "REQUESTLOAN":
-            case "SHOWAVAILABLELOANS": {
+           case "REQUESTLOAN":
+               return "REQUESTLOAN not implemented yet on server side.";
+            
+            case "SHOWAVAILABLELOANS": 
                 return bank.showAvailableLoans();
-                }
 
-                case "MYLOANS": {
-                    return bank.showMyLoans(customer);
-                }
-                            case "ACCEPTLOAN":
-
+             case "MYLOANS":
+                return bank.showMyLoans(customer);
+                
+            
+            case "ACCEPTLOAN":
             case "REPAYLOAN":
                 return name + " not implemented yet on server side.";
 
@@ -146,17 +150,24 @@ public class CommandProcessor {
     private String buildHelpMessage() {
         return String.join("\n",
                 "Available commands:",
+                "  You can either:",
+                "    - Type the full command with arguments, e.g. TRANSFER Main Savings 100.00",
+                "    - Or type just the command name (e.g. TRANSFER, CREATEACCOUNT) and follow the prompts.",
+                "",
                 "  SHOWMYACCOUNTS",
+                "  BALANCE",
                 "  CREATEACCOUNT <accountName>",
                 "  CLOSEACCOUNT <accountName>",
                 "  TRANSFER <fromAccount> <toAccount> <amount>",
                 "  VIEWTRANSACTIONS <accountName>",
                 "  OFFERLOAN <fromAccount> <amount> <annualRate%> <termMonths> [extra terms...]",
+                "  REQUESTLOAN <toAccount> <amount> <maxRate> <termMonths>",
                 "  SHOWAVAILABLELOANS",
+                "  ACCEPTLOAN <loanId> <toAccount>",
                 "  MYLOANS",
-
-                // more loan commands later...
-                "  LOGOUT / EXIT / QUIT"
+                "  REPAYLOAN <loanId> <amount>",
+                "  LOGOUT / EXIT / QUIT",
+                "END_OF_HELP"
         );
     }
 }
