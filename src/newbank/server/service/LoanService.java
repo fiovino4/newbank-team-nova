@@ -1,9 +1,11 @@
-package newbank.server.loan;
+package newbank.server.service;
 
 import newbank.server.Account;
 import newbank.server.Customer;
 import newbank.server.CustomerID;
 import newbank.server.NewBank;
+import newbank.server.model.loan.Loan;
+import newbank.server.model.loan.LoanStatus;
 
 import java.util.HashMap;
 import java.util.Map;

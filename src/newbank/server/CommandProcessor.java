@@ -1,6 +1,6 @@
 package newbank.server;
 
-import newbank.server.loan.Loan;
+import newbank.server.model.loan.Loan;
 
 import java.util.List;
 import java.util.Arrays;

@@ -1,6 +1,6 @@
 package newbank.server;
 
-import newbank.server.loan.LoanService;
+import newbank.server.service.LoanService;
 
 import java.util.HashMap;
 

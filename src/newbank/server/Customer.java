@@ -1,6 +1,6 @@
 package newbank.server;
 
-import newbank.server.security.PasswordManagerService;
+import newbank.server.service.security.PasswordManagerService;
 import java.util.ArrayList;
 
 public class Customer {
