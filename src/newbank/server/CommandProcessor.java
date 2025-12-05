@@ -43,6 +43,9 @@ public class CommandProcessor {
                 return bank.showMyAccounts(customer) + "\nEND_OF_ACCOUNTS";
 
             case "CREATEACCOUNT": {
+
+                return  "test";
+                /*
                 if (args.size() != 1) {
                     return "Usage: CREATEACCOUNT <accountName>";
                 }
@@ -55,6 +58,8 @@ public class CommandProcessor {
                     return "FAIL: Could not create account '" + accountName
                             + "'. It may already exist.";
                 }
+
+                 */
             }
 
             case "CLOSEACCOUNT": {
@@ -63,7 +68,9 @@ public class CommandProcessor {
                 }
 
                 String closeAccountName = args.get(0);
-                return bank.closeAccount(customer, closeAccountName);
+
+                return "test";
+                //return bank.closeAccount(customer, closeAccountName);
             }
 
             case "TRANSFER": {
@@ -86,48 +93,10 @@ public class CommandProcessor {
                     return "FAIL: Amount must be positive.";
                 }
 
-                return bank.transfer(customer, fromAccount, toAccount, amount);
+                return "test";
+
+                //return bank.transfer(customer, fromAccount, toAccount, amount);
             }
-
-            case "OFFERLOAN": {
-                // Usage: OFFERLOAN <fromAccount> <amount> <annualRate%> <termMonths> [extra terms...]
-                if (args.size() < 4) {
-                    return "Usage: OFFERLOAN <fromAccount> <amount> <annualRate%> <termMonths> [extra terms...]";
-                }
-
-                String fromAccount = args.get(0);
-                String amountStr   = args.get(1);
-                String rateStr     = args.get(2);
-                String termStr     = args.get(3);
-
-                String extraTerms = "";
-                if (args.size() > 4) {
-                    extraTerms = String.join(" ", args.subList(4, args.size()));
-                }
-
-                double amount;
-                double annualRate;
-                int termMonths;
-
-                try {
-                    amount = Double.parseDouble(amountStr);
-                } catch (NumberFormatException e) {
-                    return "FAIL: Amount must be a number.";
-                }
-
-                try {
-                    annualRate = Double.parseDouble(rateStr);
-                } catch (NumberFormatException e) {
-                    return "FAIL: Interest rate must be a number (e.g. 5 or 5.5).";
-                }
-
-                try {
-                    termMonths = Integer.parseInt(termStr);
-                } catch (NumberFormatException e) {
-                    return "FAIL: Term must be an integer number of months.";
-                }
-
-            // ===== Loans (placeholders) =====
             case "OFFERLOAN":
 
                 if(args.size() !=4){
@@ -154,22 +123,21 @@ public class CommandProcessor {
                     return "FAIL: " + e.getMessage();
                 }
 
-
             case "REQUESTLOAN":
-            case "SHOWAVAILABLELOANS":
-            case "ACCEPTLOAN":
-            case "MYLOANS":
-                return bank.offerLoan(customer, fromAccount, amount, annualRate, termMonths, extraTerms);
-            }
-
-           case "REQUESTLOAN":
                return "REQUESTLOAN not implemented yet on server side.";
 
-            case "SHOWAVAILABLELOANS":
-                return bank.showAvailableLoans();
 
-             case "MYLOANS":
-                return bank.showMyLoans(customer);
+            case "SHOWAVAILABLELOANS": {
+                String result = bank.getLoanService().showAvailableLoans();
+
+                return result + "END_OF_LOANS";
+            }
+
+            case "MYLOANS": {
+                String result = bank.getLoanService().showUserLoan(customer);
+
+                return result + System.lineSeparator() + "END_OF_MYLOANS";
+            }
 
 
             case "ACCEPTLOAN":

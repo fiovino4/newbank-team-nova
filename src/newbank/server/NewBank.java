@@ -15,6 +15,9 @@ public class NewBank {
 		customers = new HashMap<>();
 		addTestData();
 		loanService = new LoanService(this);
+
+		addTestLoans();
+
 	}
 
 
@@ -42,6 +45,54 @@ public class NewBank {
 		test.addAccount(new Account("Bonds", 1000.0));
 		customers.put("Test", test);
 	}
+
+
+	private void addTestLoans() {
+		try {
+			// Bhagy offers a loan
+			loanService.offerLoan(
+					new CustomerID("Bhagy"),
+					"Main",
+					200.0,
+					5.0,
+					12,
+					"Test loan from Bhagy"
+			);
+
+			loanService.offerLoan(
+					new CustomerID("Bhagy"),
+					"Main",
+					200.0,
+					5.0,
+					12,
+					"Test loan from Bhagy"
+			);
+
+			// Christina offers a loan
+			loanService.offerLoan(
+					new CustomerID("Christina"),
+					"Savings",
+					300.0,
+					4.5,
+					6,
+					"Short-term loan"
+			);
+
+			// Test user offers a loan
+			loanService.offerLoan(
+					new CustomerID("Test"),
+					"Savings",
+					150.0,
+					3.0,
+					3,
+					"Demo loan"
+			);
+		}
+		catch (IllegalArgumentException e) {
+			System.out.println("Error creating test loan: " + e.getMessage());
+		}
+	}
+
 
 	public static NewBank getBank() {
 		return bank;

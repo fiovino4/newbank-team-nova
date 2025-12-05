@@ -110,14 +110,55 @@ public class LoanService {
          */
 
         int id = nextLoanId.getAndIncrement();
-        Loan loan = new Loan(id, lenderId, fromAccount, amount, interestRate, termMonths, extraTerms, LoanStatus.ACTIVE);
+        Loan loan = new Loan(id, lenderId, fromAccount, amount, interestRate, termMonths, extraTerms, LoanStatus.AVAILABLE);
 
         loans.put(id, loan);
 
         return loan;
     }
 
-    /**
-     * TODO: other loan service as listAvailableLoans or requestLoan or acceptLoan
-     **/
- }
+    public synchronized String showUserLoan(CustomerID customerID) {
+        if (customerID == null) {
+            return "FAIL: Not logged in.";
+        }
+
+        String customerName = customerID.getKey();
+        StringBuilder sb = new StringBuilder();
+
+        for (Loan loan : loans.values()) {
+
+            if (loan.getLender().getKey().equalsIgnoreCase(customerName)) {
+                if (sb.isEmpty()) {
+                    sb.append("Your loan offers:").append(System.lineSeparator());
+                } else {
+                    sb.append(System.lineSeparator());
+                }
+                sb.append(loan);
+            }
+        }
+
+        if (sb.isEmpty()) {
+            return "You have not created any loan offers.";
+        }
+
+        return sb.toString();
+    }
+
+    public synchronized String showAvailableLoans() {
+        StringBuilder sb = new StringBuilder();
+
+        for (Loan loan : loans.values()) {
+            if (loan.getLoanStatus() == LoanStatus.AVAILABLE) {
+                if (sb.isEmpty()) {
+                    sb.append("Available loans:").append("\n");
+                }
+                sb.append(loan).append("\n");
+            }
+        }
+
+        if (sb.isEmpty()) {
+            return "There are currently no available loans.";
+        }
+        return sb.toString();
+    }
+}
