@@ -63,4 +63,35 @@ public class Customer {
 		}
 		return null;
 	}
+
+public boolean hasAccount(String accountName) {
+    for (Account a : accounts) {
+        if (a.getAccountName().equalsIgnoreCase(accountName)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+public Account getAccount(String accountName) {
+    for (Account a : accounts) {
+        if (a.getAccountName().equalsIgnoreCase(accountName)) {
+            return a;
+        }
+    }
+    return null;
+}
+
+public boolean removeAccount(String accountName) {
+    for (int i = 0; i < accounts.size(); i++) {
+        Account a = accounts.get(i);
+        if (a.getAccountName().equalsIgnoreCase(accountName)) {
+            accounts.remove(i);
+            return true;
+        }
+    }
+    return false;
+}
+
+
 }
