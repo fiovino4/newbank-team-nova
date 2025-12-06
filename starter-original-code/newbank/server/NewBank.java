@@ -52,4 +52,14 @@ public class NewBank {
 		return (customers.get(customer.getKey())).accountsToString();
 	}
 
+    public boolean addAccount(CustomerID customer, String pendingAccountName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'addAccount'");
+    }
+
+    public Customer getCustomer(String userName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCustomer'");
+    }
+
 }

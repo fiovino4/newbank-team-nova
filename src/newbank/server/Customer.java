@@ -20,14 +20,14 @@ public class Customer {
     public String accountsToString() {
         StringBuilder sb = new StringBuilder();
         for (Account a : accounts) {
-            if (!sb.isEmpty()) {
+            // Check the length instead of calling isEmpty()
+            if (sb.length() > 0) {
                 sb.append("\n");
             }
             sb.append("> ").append(a.toString());
         }
         return sb.toString();
     }
-
 
 	public void addAccount(Account account) {
 		accounts.add(account);		
