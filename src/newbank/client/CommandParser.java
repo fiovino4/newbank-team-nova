@@ -55,8 +55,10 @@ public class CommandParser {
             case "ACCEPTLOAN" -> 2;          // ACCEPTLOAN <loanId> <toAcc>
             case "MYLOANS" -> 0;             // MYLOANS
             case "REPAYLOAN" -> 2;           // REPAYLOAN <loanId> <amount>
+            case "SHOWNOTIFICATIONS" ->  0;
 
             default -> -1;
+
         };
     }
 

@@ -44,7 +44,6 @@ public class Loan {
 
     }
 
-
     public long getId() {
         return id;
     }
@@ -75,6 +74,10 @@ public class Loan {
 
     public LoanStatus getLoanStatus() {
         return loanStatus;
+    }
+
+    public void setLoanStatus(LoanStatus loanStatus){
+        this.loanStatus = loanStatus;
     }
 
 

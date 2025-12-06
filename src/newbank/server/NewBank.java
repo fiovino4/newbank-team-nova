@@ -1,6 +1,9 @@
 package newbank.server;
 
 import newbank.server.service.LoanService;
+import newbank.server.loan.Loan;
+import newbank.server.loan.LoanService;
+import newbank.server.notification.NotificationService;
 
 import java.util.HashMap;
 
@@ -10,14 +13,17 @@ public class NewBank {
 	private final HashMap<String, Customer> customers;
 
 	private final LoanService loanService;
+	private final NotificationService notificationService;
 
 	private NewBank() {
 		customers = new HashMap<>();
-		addTestData();
 		loanService = new LoanService(this);
 
 		addTestLoans();
 
+		notificationService = new NotificationService();
+
+		addTestData();
 	}
 
 
@@ -26,10 +32,18 @@ public class NewBank {
 		return loanService;
 	}
 
+	public NotificationService getNotificationService() {
+		return notificationService;
+	}
+
 	private void addTestData() {
 		Customer bhagy = new Customer("1234");
 		bhagy.addAccount(new Account("Main", 1000.0));
 		customers.put("Bhagy", bhagy);
+
+		//mock a loan for Bhagy ----
+		CustomerID bhagyId  = new CustomerID("Bhagy");
+		Loan mockLoan = loanService.offerLoan(bhagyId, "Main", 500, 5.0, 12, "Mock loan for testing");
 
 		Customer christina = new Customer("abcd");
 		christina.addAccount(new Account("Savings", 1500.0));

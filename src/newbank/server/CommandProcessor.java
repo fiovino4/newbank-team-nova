@@ -4,6 +4,7 @@ import newbank.server.model.loan.Loan;
 
 import java.util.List;
 import java.util.Arrays;
+import newbank.server.notification.Notification;
 
 public class CommandProcessor {
 
@@ -140,7 +141,42 @@ public class CommandProcessor {
             }
 
 
+
+                if(args.size() != 1){
+                    return "Usage: REQUESTLOAN <loanId>";
+                }
+
+                try {
+                    int requestedLoanId = Integer.parseInt(args.get(0));
+                    Loan loan = bank.getLoanService().requestLoan(customer, requestedLoanId);
+
+                    return "SUCCESS: Loan " + loan.getId() + " has been successfully requested.";
+
+                }catch (IllegalArgumentException e){
+
+                    return "FAIL: " + e.getMessage();
+                }
+
+
+            case "SHOWNOTIFICATIONS": {
+                List<Notification> notifications = bank.getNotificationService().getNotifications(customer);
+
+                if (notifications.isEmpty()) {
+                    return "You have no notifications.";
+                }
+
+                StringBuilder sb = new StringBuilder("Your notifications:\n");
+                for (Notification n : notifications) {
+                    sb.append("  [").append(n.getId()).append("] ")
+                            .append(n.getMessage()).append(" (").append(n.isRead() ? "read" : "unread")
+                            .append(")\n");
+                }
+                return sb.toString().trim();
+            }
+
+            case "SHOWAVAILABLELOANS":
             case "ACCEPTLOAN":
+            case "MYLOANS":
             case "REPAYLOAN":
                 return name + " not implemented yet on server side.";
 
