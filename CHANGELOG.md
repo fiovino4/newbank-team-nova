@@ -103,3 +103,114 @@ Parser now supports:
     - `TRANSFER` (placeholder)
     - `LOGIN` flow (username + password)
 - Starter README.
+
+
+## [2.0.0] – Loan Module Refactor 
+
+### Overview
+
+This refactor introduces a clear separation between the Loan domain model and the LoanService business logic. The redesign enforces a cleaner architecture by isolating data representation from business rules, making the loan subsystem more maintainable, testable, and extensible.
+
+1. Introduction of model/loan Package (Domain Layer)
+
+    The model/loan folder now contains all domain entities related to loans.
+
+    Loan
+
+  Rewritten as a pure data model.
+  
+  Contains only fields, getters, and a string representation.
+  
+  No validation or business logic remains inside this class.
+  
+  Fields include:
+  
+  id
+  
+  lender (CustomerID)
+  
+  fromAccount
+  
+  amount
+  
+  interestRate
+  
+  termMonths
+  
+  extraTerms
+  
+  loanStatus (LoanStatus)
+  
+  This ensures that the model is immutable with respect to business rules, and all logic is delegated to the service layer.
+  
+  LoanStatus
+  
+  A dedicated enum defining the lifecycle states of a loan:
+  
+  AVAILABLE
+  
+  REQUESTED
+  
+  ACTIVE
+  
+  REPAID
+  
+  CANCELLED
+
+2. Addition of LoanService (Service Layer)
+    
+    A dedicated service class has been created to handle all loan-related business operations.
+    
+    Responsibilities
+    
+    Validate loan creation requests.
+    
+    Verify lender identity and account ownership.
+    
+    Ensure sufficient account balance.
+    
+    Enforce positive values for amount, interest rate, and term.
+    
+    Generate unique loan IDs using AtomicInteger.
+    
+    Store loans in an internal Map (Map<Integer, Loan>).
+    
+    Manage loan state transitions and expose query methods.
+    
+    The method offerLoan now performs all validation and constructs domain model objects only after ensuring the request is valid.
+
+2.Architectural Separation of Concerns
+    
+   The refactor establishes a clearer boundary between different layers:
+    
+   Layer	Responsibility
+   model.loan	Domain entities; data only, no logic
+   service.LoanService	Business logic, validation, state management
+   NewBank	Orchestration and dependency wiring
+   CommandProcessor	Parsing client commands and returning formatted responses
+
+
+3.Recap of Architectural Separation of Concerns
+
+| Layer               | Responsibility                                            |
+| ------------------- | --------------------------------------------------------- |
+| model.loan          | Domain entities; data only, no logic                      |
+| service.LoanService | Business logic, validation, state management              |
+| NewBank             | Orchestration and dependency wiring                       |
+| CommandProcessor    | Parsing client commands and returning formatted responses |
+
+
+
+4. Improved Query Methods
+
+Two methods now provide structured output for loan listings:
+
+showUserLoan
+
+Returns a formatted, multi-line list of all loans created by the logged-in customer.
+
+showAvailableLoans
+
+Returns a formatted, multi-line list of all loans currently in the AVAILABLE state.
+
+Both methods now provide consistent, readable output and do not perform any business mutations.

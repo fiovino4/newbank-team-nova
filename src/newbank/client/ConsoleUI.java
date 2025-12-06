@@ -109,6 +109,23 @@ public class ConsoleUI {
                 continue;
             }
 
+            if ("SHOWAVAILABLELOANS".equals(cmd.getName())) {
+                boolean ok = readMultilineResponseUntilEndMarker("END_OF_LOANS");
+                if (!ok) {
+                    break;
+                }
+                continue;
+            }
+
+            // Special handling for user's own loans (multi-line)
+            if ("MYLOANS".equals(cmd.getName())) {
+                boolean ok = readMultilineResponseUntilEndMarker("END_OF_MYLOANS");
+                if (!ok) {
+                    break;
+                }
+                continue;
+            }
+
             // Default: single-line response
             String response;
             try {

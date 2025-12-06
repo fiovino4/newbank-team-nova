@@ -1,4 +1,4 @@
-package newbank.server.security;
+package newbank.server.service.security;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
