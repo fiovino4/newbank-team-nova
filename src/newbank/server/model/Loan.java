@@ -1,6 +1,4 @@
-package newbank.server.model.loan;
-
-import newbank.server.CustomerID;
+package newbank.server.model;
 
 /**
  * Represents a loan offered within the NewBank system.

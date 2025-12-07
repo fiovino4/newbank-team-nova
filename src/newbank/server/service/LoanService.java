@@ -1,12 +1,12 @@
 package newbank.server.service;
 
-import newbank.server.Account;
-import newbank.server.Customer;
-import newbank.server.CustomerID;
+import newbank.server.model.Account;
+import newbank.server.model.Customer;
+import newbank.server.model.CustomerID;
 import newbank.server.NewBank;
-import newbank.server.model.loan.Loan;
-import newbank.server.model.loan.LoanStatus;
-import newbank.server.notification.Notification;
+import newbank.server.model.Loan;
+import newbank.server.model.LoanStatus;
+import newbank.server.model.Notification;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -161,6 +161,11 @@ public class LoanService {
             throw new IllegalArgumentException("The loan id does not exist in the loan list");
         }
 
+        if(requestedLoan.getLender().getKey().equals(borrowerId.getKey())){
+
+            throw new IllegalArgumentException("The borrower cannot be the same as the lender");
+        }
+
         if(requestedLoan.getLoanStatus().equals(LoanStatus.AVAILABLE)){
 
             requestedLoan.setLoanStatus(LoanStatus.REQUESTED);
@@ -180,7 +185,7 @@ public class LoanService {
 
         return  requestedLoan;
     }
- }
+
     public synchronized String showUserLoan(CustomerID customerID) {
         if (customerID == null) {
             return "FAIL: Not logged in.";
@@ -226,3 +231,5 @@ public class LoanService {
         return sb.toString();
     }
 }
+
+

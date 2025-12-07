@@ -1,6 +1,4 @@
-package newbank.server.notification;
-
-import newbank.server.CustomerID;
+package newbank.server.model;
 
 import java.time.LocalDateTime;
 

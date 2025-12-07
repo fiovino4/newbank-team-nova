@@ -1,6 +1,8 @@
-package newbank.server.notification;
+package newbank.server.service;
 
-import newbank.server.CustomerID;
+import newbank.server.model.CustomerID;
+import newbank.server.model.Notification;
+
 import java.util.*;
 
 /**

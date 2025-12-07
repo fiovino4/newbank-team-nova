@@ -1,10 +1,11 @@
 package newbank.server;
 
-import newbank.server.model.loan.Loan;
-
 import java.util.List;
 import java.util.Arrays;
-import newbank.server.notification.Notification;
+
+import newbank.server.model.CustomerID;
+import newbank.server.model.Loan;
+import newbank.server.model.Notification;
 
 public class CommandProcessor {
 
@@ -125,22 +126,6 @@ public class CommandProcessor {
                 }
 
             case "REQUESTLOAN":
-               return "REQUESTLOAN not implemented yet on server side.";
-
-
-            case "SHOWAVAILABLELOANS": {
-                String result = bank.getLoanService().showAvailableLoans();
-
-                return result + "END_OF_LOANS";
-            }
-
-            case "MYLOANS": {
-                String result = bank.getLoanService().showUserLoan(customer);
-
-                return result + System.lineSeparator() + "END_OF_MYLOANS";
-            }
-
-
 
                 if(args.size() != 1){
                     return "Usage: REQUESTLOAN <loanId>";
@@ -156,7 +141,6 @@ public class CommandProcessor {
 
                     return "FAIL: " + e.getMessage();
                 }
-
 
             case "SHOWNOTIFICATIONS": {
                 List<Notification> notifications = bank.getNotificationService().getNotifications(customer);
@@ -174,9 +158,20 @@ public class CommandProcessor {
                 return sb.toString().trim();
             }
 
-            case "SHOWAVAILABLELOANS":
+            case "SHOWAVAILABLELOANS": {
+                String result = bank.getLoanService().showAvailableLoans();
+
+                return result + "END_OF_LOANS";
+            }
+
+            case "MYLOANS": {
+                String result = bank.getLoanService().showUserLoan(customer);
+
+                return result + System.lineSeparator() + "END_OF_MYLOANS";
+            }
+
             case "ACCEPTLOAN":
-            case "MYLOANS":
+
             case "REPAYLOAN":
                 return name + " not implemented yet on server side.";
 
@@ -199,7 +194,7 @@ public class CommandProcessor {
                 "  TRANSFER <fromAccount> <toAccount> <amount>",
                 "  VIEWTRANSACTIONS <accountName>",
                 "  OFFERLOAN <fromAccount> <amount> <annualRate%> <termMonths> [extra terms...]",
-                "  REQUESTLOAN <toAccount> <amount> <maxRate> <termMonths>",
+                "  REQUESTLOAN <loanId>",
                 "  SHOWAVAILABLELOANS",
                 "  ACCEPTLOAN <loanId> <toAccount>",
                 "  MYLOANS",

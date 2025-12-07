@@ -1,5 +1,8 @@
 package newbank.server;
 
+import newbank.server.model.Customer;
+import newbank.server.model.CustomerID;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
