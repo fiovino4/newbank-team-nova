@@ -1,9 +1,11 @@
 package newbank.server;
 
-import newbank.server.model.loan.Loan;
-
 import java.util.List;
 import java.util.Arrays;
+
+import newbank.server.model.CustomerID;
+import newbank.server.model.Loan;
+import newbank.server.model.Notification;
 
 public class CommandProcessor {
 
@@ -124,8 +126,37 @@ public class CommandProcessor {
                 }
 
             case "REQUESTLOAN":
-               return "REQUESTLOAN not implemented yet on server side.";
 
+                if(args.size() != 1){
+                    return "Usage: REQUESTLOAN <loanId>";
+                }
+
+                try {
+                    int requestedLoanId = Integer.parseInt(args.get(0));
+                    Loan loan = bank.getLoanService().requestLoan(customer, requestedLoanId);
+
+                    return "SUCCESS: Loan " + loan.getId() + " has been successfully requested.";
+
+                }catch (IllegalArgumentException e){
+
+                    return "FAIL: " + e.getMessage();
+                }
+
+            case "SHOWNOTIFICATIONS": {
+                List<Notification> notifications = bank.getNotificationService().getNotifications(customer);
+
+                if (notifications.isEmpty()) {
+                    return "You have no notifications.";
+                }
+
+                StringBuilder sb = new StringBuilder("Your notifications:\n");
+                for (Notification n : notifications) {
+                    sb.append("  [").append(n.getId()).append("] ")
+                            .append(n.getMessage()).append(" (").append(n.isRead() ? "read" : "unread")
+                            .append(")\n");
+                }
+                return sb.toString().trim();
+            }
 
             case "SHOWAVAILABLELOANS": {
                 String result = bank.getLoanService().showAvailableLoans();
@@ -139,8 +170,8 @@ public class CommandProcessor {
                 return result + System.lineSeparator() + "END_OF_MYLOANS";
             }
 
-
             case "ACCEPTLOAN":
+
             case "REPAYLOAN":
                 return name + " not implemented yet on server side.";
 
@@ -163,7 +194,7 @@ public class CommandProcessor {
                 "  TRANSFER <fromAccount> <toAccount> <amount>",
                 "  VIEWTRANSACTIONS <accountName>",
                 "  OFFERLOAN <fromAccount> <amount> <annualRate%> <termMonths> [extra terms...]",
-                "  REQUESTLOAN <toAccount> <amount> <maxRate> <termMonths>",
+                "  REQUESTLOAN <loanId>",
                 "  SHOWAVAILABLELOANS",
                 "  ACCEPTLOAN <loanId> <toAccount>",
                 "  MYLOANS",

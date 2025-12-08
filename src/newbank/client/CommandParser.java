@@ -50,13 +50,15 @@ public class CommandParser {
 
             // Loan commands
             case "OFFERLOAN" -> 4;           // OFFERLOAN <fromAcc> <amount> <rate> <termMonths>
-            case "REQUESTLOAN" -> 4;         // REQUESTLOAN <toAcc> <amount> <maxRate> <termMonths>
+            case "REQUESTLOAN" -> 1;         // REQUESTLOAN <loanId>
             case "SHOWAVAILABLELOANS" -> 0;  // SHOWAVAILABLELOANS
             case "ACCEPTLOAN" -> 2;          // ACCEPTLOAN <loanId> <toAcc>
             case "MYLOANS" -> 0;             // MYLOANS
             case "REPAYLOAN" -> 2;           // REPAYLOAN <loanId> <amount>
+            case "SHOWNOTIFICATIONS" ->  0;
 
             default -> -1;
+
         };
     }
 
@@ -71,11 +73,12 @@ public class CommandParser {
             case "TRANSFER" -> "TRANSFER <fromAccount> <toAccount> <amount>";
             case "VIEWTRANSACTIONS" -> "VIEWTRANSACTIONS <accountName>";
             case "OFFERLOAN" -> "OFFERLOAN <fromAccount> <amount> <rate> <termMonths>";
-            case "REQUESTLOAN" -> "REQUESTLOAN <toAccount> <amount> <maxRate> <termMonths>";
+            case "REQUESTLOAN" -> "REQUESTLOAN <loanId>";
             case "SHOWAVAILABLELOANS" -> "SHOWAVAILABLELOANS";
             case "ACCEPTLOAN" -> "ACCEPTLOAN <loanId> <toAccount>";
             case "MYLOANS" -> "MYLOANS";
             case "REPAYLOAN" -> "REPAYLOAN <loanId> <amount>";
+            case "SHOWNOTIFICATIONS" -> "SHOWNOTIFICATIONS";
             default -> "";
         };
     }

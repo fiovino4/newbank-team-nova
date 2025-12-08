@@ -1,4 +1,4 @@
-package newbank.server.model.loan;
+package newbank.server.model;
 
 /**
  * Represents the possible lifecycle states of a Loan.
