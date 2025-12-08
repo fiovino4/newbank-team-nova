@@ -3,11 +3,53 @@
 All notable changes to the NewBank project are documented here.
 
 ---
-
-## [1.1.1] - 
+## [1.1.2] - 
 ### Added
 ### Changed
 ### Fixed
+
+## [1.1.1] -Loan Marketplace + Core Banking Enhancements
+### Added
+-Loan marketplace system
+    -Loan data model with auto-generated IDs.
+    -OFFERLOAN command for creating micro-loan offers.
+    -SHOWAVAILABLELOANS displays all open loan offers.
+    -MYLOANS shows loans created by the logged-in user.
+
+-Account management utilities
+    -Added Customer.getAccount, hasAccount, removeAccount.
+    -Expanded Account model with balance, getters/setters, and formatted output.
+
+### Changed
+-Improved CommandProcessor:
+    -Added scoped case blocks to eliminate duplicate variable issues.
+    -Added argument validation and clearer error messages.
+    -Updated HELP output to include loan-related commands.
+
+### Fixed
+-SHOWMYACCOUNTS server crash
+    -Replaced invalid StringBuilder.isEmpty() with length check.
+    -Improved handling of unknown customers in NewBank.showMyAccounts.
+
+### Implemented
+-CREATEACCOUNT
+    -Prevents duplicates.
+    -Uses NewBank.createAccount for consistent logic.
+
+-TRANSFER
+    -Full intra-customer transfer system.
+    -Validates:
+    -both accounts exist,
+    -amount is numeric and positive,
+    -sufficient funds.
+    -Updates balances via Account.setBalance.
+
+-CLOSEACCOUNT
+-Ensures:
+    -customer exists,
+    -account exists,
+    -balance must be zero before closing.
+    -Removes account cleanly from customer profile.
 
 ---
 
