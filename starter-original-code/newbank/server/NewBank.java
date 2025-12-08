@@ -7,7 +7,7 @@ public class NewBank {
 	private static final NewBank bank = new NewBank();
 	private HashMap<String,Customer> customers;
 	
-	private NewBank() {
+	NewBank() {
 		customers = new HashMap<>();
 		addTestData();
 	}
@@ -60,6 +60,11 @@ public class NewBank {
     public Customer getCustomer(String userName) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getCustomer'");
+    }
+
+    public void addCustomer(String string, String string2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'addCustomer'");
     }
 
 }
