@@ -29,7 +29,7 @@ public class ParsedCommand {
 
     public static ParsedCommand invalid(String errorMessage) {
         if (errorMessage == null || errorMessage.trim().isEmpty()) {
-            errorMessage = "Invalidcommand.";
+            errorMessage = "Unknown command. Type HELP for a list of commands.";
         }
         return new ParsedCommand(null, Collections.emptyList(), false, errorMessage);
     }
