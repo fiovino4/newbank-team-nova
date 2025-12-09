@@ -1,24 +1,47 @@
 package newbank.tests;
 
-import newbank.server.Account;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import newbank.server.model.Account;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class AccountTest {
 
     @Test
-    public void shouldReturnCorrectToString() {
+    public void shouldStoreNameAndOpeningBalance() {
         Account account = new Account("Savings", 200.0);
-        assertEquals("Savings: 200.0", account.toString());
+
+        String name = account.getAccountName();
+        double balance = account.getBalance();
+
+        assertEquals("Account name should match constructor argument",
+                "Savings", name);
+        assertEquals("Account balance should match constructor argument",
+                200.0, balance, 0.0001);
     }
-    // Verifies that the toString method returns the correct format.
 
     @Test
-    public void shouldStoreAccountNameAndOpeningBalance() {
-        Account account = new Account("Checking", 150.0);
-        // Direct field access is not possible, so test via toString
-        assertTrue(account.toString().contains("Checking"));
-        assertTrue(account.toString().contains("150.0"));
+    public void shouldAllowZeroOpeningBalance() {
+        Account account = new Account("Empty", 0.0);
+
+        String name = account.getAccountName();
+        double balance = account.getBalance();
+
+        assertEquals("Account name should be 'Empty'",
+                "Empty", name);
+        assertEquals("Account balance should be zero when constructed with 0.0",
+                0.0, balance, 0.0001);
     }
-    // Checks that the account name and opening balance are stored correctly.
+
+    @Test
+    public void toStringShouldIncludeNameAndBalance() {
+        Account account = new Account("Checking", 150.0);
+
+        String s = account.toString();
+
+        assertTrue("toString() should contain the account name",
+                s.contains("Checking"));
+        assertTrue("toString() should contain the balance (150.0)",
+                s.contains("150"));
+    }
 }
