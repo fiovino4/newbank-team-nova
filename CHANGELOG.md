@@ -289,3 +289,6 @@ Ensures that invalid login details return null.
 Verifies that SHOWMYACCOUNTS returns the correct account information for a known customer.
 Verifies successful login with correct credentials.
 
+LoanService Test:
+Verifies that offering a negative loan amount is rejected and does not alter the loan marketplace.
+
