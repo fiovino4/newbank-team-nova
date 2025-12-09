@@ -3,6 +3,7 @@ package newbank.server;
 import java.util.List;
 import java.util.Arrays;
 
+import newbank.server.model.Account;
 import newbank.server.model.CustomerID;
 import newbank.server.model.Loan;
 import newbank.server.model.Notification;
@@ -40,28 +41,30 @@ public class CommandProcessor {
 
             case "SHOWMYACCOUNTS":
             case "BALANCE":
-            case "BALANCES":
-                // BALANCE/BALANCES are aliases for SHOWMYACCOUNTS
-                return bank.showMyAccounts(customer) + "\nEND_OF_ACCOUNTS";
+            case "BALANCES": {
+                // Use AccountService via NewBank
+                String accounts = bank.getAccountService().showAccounts(customer);
+                return accounts + "\nEND_OF_ACCOUNTS";
+            }
 
             case "CREATEACCOUNT": {
-
-                return  "test";
-                /*
                 if (args.size() != 1) {
                     return "Usage: CREATEACCOUNT <accountName>";
                 }
 
                 String accountName = args.get(0);
-                boolean created = bank.createAccount(customer, accountName);
-                if (created) {
-                    return "SUCCESS: Account '" + accountName + "' created.";
-                } else {
+                String username = customer.getKey();
+
+                // Use CustomerService to check + create
+                if (bank.getAccountService().hasAccount(username, accountName)) {
                     return "FAIL: Could not create account '" + accountName
                             + "'. It may already exist.";
                 }
 
-                 */
+                // Starting balance 0.0 by default
+                bank.getAccountService().addAccount(username, new Account(accountName, 0.0));
+
+                return "SUCCESS: Account '" + accountName + "' created.";
             }
 
             case "CLOSEACCOUNT": {
@@ -70,9 +73,14 @@ public class CommandProcessor {
                 }
 
                 String closeAccountName = args.get(0);
+                String username = customer.getKey();
 
-                return "test";
-                //return bank.closeAccount(customer, closeAccountName);
+                boolean removed = bank.getAccountService().removeAccount(username, closeAccountName);
+                if (removed) {
+                    return "SUCCESS: Account '" + closeAccountName + "' closed.";
+                } else {
+                    return "FAIL: Account '" + closeAccountName + "' not found or could not be closed.";
+                }
             }
 
             case "TRANSFER": {
@@ -95,10 +103,15 @@ public class CommandProcessor {
                     return "FAIL: Amount must be positive.";
                 }
 
-                return "test";
-
-                //return bank.transfer(customer, fromAccount, toAccount, amount);
+                try {
+                    bank.getAccountService().transfer(customer, fromAccount, toAccount, amount);
+                    return "SUCCESS: Transferred " + amount + " from '" + fromAccount +
+                            "' to '" + toAccount + "'.";
+                } catch (IllegalArgumentException e) {
+                    return "FAIL: " + e.getMessage();
+                }
             }
+
             case "OFFERLOAN":
 
                 if(args.size() !=4){
