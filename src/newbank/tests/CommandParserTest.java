@@ -92,4 +92,26 @@ public class CommandParserTest {
                 "Savings", cmd.getArguments().getFirst());
     }
     // Ensures command names are case-insensitive but stored in a normalised form.
+
+    @Test
+    public void shouldRejectBlankInput() {
+        CommandParser parser = new CommandParser();
+        ParsedCommand cmd = parser.parse("   ");
+        assertFalse(cmd.isValid());
+        assertTrue(cmd.getMessage().contains("Please enter a command"));
+    }
+// Verifies that blank input is handled as an invalid command.
+
+    @Test
+    public void shouldNotCrashOnInvalidInput() {
+        try {
+            CommandParser parser = new CommandParser();
+            ParsedCommand cmd = parser.parse("INVALIDCOMMAND");
+            // Server should not throw, crash, or close connection
+            assertNotNull(cmd);
+        } catch (Exception e) {
+            fail("System crashed on invalid input: " + e.getMessage());
+        }
+    }
+// Ensures that invalid commands do not crash the system.
 }

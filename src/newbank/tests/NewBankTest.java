@@ -71,4 +71,14 @@ public class NewBankTest {
                 accounts.contains("1000.0"));
     }
     // Verifies that SHOWMYACCOUNTS returns the correct account information for a known customer.
+
+    @Test
+    public void shouldLoginSuccessfullyWithCorrectCredentials() {
+        NewBank bank = NewBank.getBank();
+        CustomerID id = bank.checkLogInDetails("Bhagy", ""); // Assuming "" is a valid password for test data
+        assertNotNull(id);
+        String response = bank.processRequest(id, "SHOWMYACCOUNTS");
+        assertTrue(response.contains("Main"));
+    }
+    // Verifies successful login with correct credentials.
 }

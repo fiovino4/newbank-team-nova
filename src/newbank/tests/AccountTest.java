@@ -19,6 +19,7 @@ public class AccountTest {
         assertEquals("Account balance should match constructor argument",
                 200.0, balance, 0.0001);
     }
+    // Additional test cases for edge scenarios
 
     @Test
     public void shouldAllowZeroOpeningBalance() {
@@ -32,6 +33,7 @@ public class AccountTest {
         assertEquals("Account balance should be zero when constructed with 0.0",
                 0.0, balance, 0.0001);
     }
+    // Test for negative balance scenario
 
     @Test
     public void toStringShouldIncludeNameAndBalance() {

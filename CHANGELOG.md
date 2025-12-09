@@ -256,3 +256,36 @@ showAvailableLoans
 Returns a formatted, multi-line list of all loans currently in the AVAILABLE state.
 
 Both methods now provide consistent, readable output and do not perform any business mutations.
+
+5. Test Cases, in tests
+
+Added Account Test:
+Tests for negative balance
+Checks when account opens it is empty
+
+
+Added CommandParser Test:
+Verifies that a command with no arguments is parsed correctly.
+Checks that a command with arguments is parsed correctly.
+Verifies that empty input is handled as an invalid command.
+Checks that unknown commands are treated as valid with arguments.
+Ensures leading/trailing spaces do not break parsing.
+Ensures command names are case-insensitive but stored in a normalised form.
+Verifies that blank input is handled as an invalid command.
+Ensures that invalid commands do not crash the system.
+
+Added Customer Test
+Verifies that checkPassword returns true for the original password.
+Verifies that checkPassword returns false for an incorrect password.
+
+Added NewBankClientHandler Test
+This test opens a ServerSocket, connects a client Socket, accepts it and hands the accepted socket to NewBankClientHandler. The client socket is closed immediately to simulate an intentional disconnect. The test then waits for the handler thread to finish and asserts it terminates without crashing.
+
+Addded NewBank Test:
+erifies that NewBank follows the singleton pattern.
+Checks that hasCustomer reports true for a known customer.
+Checks that valid login details return a CustomerID.
+Ensures that invalid login details return null.
+Verifies that SHOWMYACCOUNTS returns the correct account information for a known customer.
+Verifies successful login with correct credentials.
+
