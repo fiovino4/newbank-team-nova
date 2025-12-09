@@ -4,32 +4,36 @@ import newbank.server.model.Account;
 import newbank.server.model.Customer;
 import newbank.server.model.CustomerID;
 import newbank.server.model.Loan;
+import newbank.server.service.AccountService;
+import newbank.server.service.CustomerService;
 import newbank.server.service.NotificationService;
 import newbank.server.service.LoanService;
-
-import java.util.HashMap;
 
 public class NewBank {
 
 	private static final NewBank bank = new NewBank();
-	private final HashMap<String, Customer> customers;
 
+	private final CustomerService customerService;
+	private final AccountService accountService;
 	private final LoanService loanService;
 	private final NotificationService notificationService;
 
 	private NewBank() {
-		customers = new HashMap<>();
-		loanService = new LoanService(this);
-
-		addTestLoans();
-
-		notificationService = new NotificationService();
+		this.customerService = new CustomerService();
+		this.accountService = new AccountService(customerService);
+		this.loanService = new LoanService(this);
+		this.notificationService = new NotificationService();
 
 		addTestData();
+		addTestLoans();
 	}
 
+	// --- service getters ---
 
-	//getter of loan Service
+	public static NewBank getBank() {
+		return bank;
+	}
+
 	public LoanService getLoanService() {
 		return loanService;
 	}
@@ -38,30 +42,35 @@ public class NewBank {
 		return notificationService;
 	}
 
-	private void addTestData() {
-		Customer bhagy = new Customer("1234");
-		bhagy.addAccount(new Account("Main", 1000.0));
-		customers.put("Bhagy", bhagy);
-
-		//mock a loan for Bhagy ----
-		CustomerID bhagyId  = new CustomerID("Bhagy");
-		Loan mockLoan = loanService.offerLoan(bhagyId, "Main", 500, 5.0, 12, "Mock loan for testing");
-
-		Customer christina = new Customer("abcd");
-		christina.addAccount(new Account("Savings", 1500.0));
-		customers.put("Christina", christina);
-
-		Customer john = new Customer("pass");
-		john.addAccount(new Account("Checking", 250.0));
-		customers.put("John", john);
-
-		Customer test = new Customer("Test");
-		test.addAccount(new Account("Main", 1000.0));
-		test.addAccount(new Account("Savings", 1000.0));
-		test.addAccount(new Account("Bonds", 1000.0));
-		customers.put("Test", test);
+	public CustomerService getCustomerService() {
+		return customerService;
 	}
 
+	public AccountService getAccountService() {
+		return accountService;
+	}
+
+	// --- test data ---
+
+	private void addTestData() {
+		// Bhagy
+		customerService.registerCustomer("Bhagy", "1234");
+		accountService.addAccount("Bhagy", new Account("Main", 1000.0));
+
+		// Christina
+		customerService.registerCustomer("Christina", "abcd");
+		accountService.addAccount("Christina", new Account("Savings", 1500.0));
+
+		// John
+		customerService.registerCustomer("John", "pass");
+		accountService.addAccount("John", new Account("Checking", 250.0));
+
+		// Test user
+		customerService.registerCustomer("Test", "Test");
+		accountService.addAccount("Test", new Account("Main", 1000.0));
+		accountService.addAccount("Test", new Account("Savings", 1000.0));
+		accountService.addAccount("Test", new Account("Bonds", 1000.0));
+	}
 
 	private void addTestLoans() {
 		try {
@@ -109,32 +118,25 @@ public class NewBank {
 		}
 	}
 
-
-	public static NewBank getBank() {
-		return bank;
-	}
+	// --- customer helpers (now delegating to services) ---
 
 	public Customer getCustomer(String userName) {
-		return customers.get(userName);
+		return customerService.getCustomer(userName);
 	}
 
 	public boolean hasCustomer(CustomerID customerID) {
-		return customers.containsKey(customerID.getKey());
-	}
-
-	public String showMyAccounts(CustomerID customerID) {
-		Customer c = customers.get(customerID.getKey());
-		if (c == null) {
-			return "FAIL: Unknown customer.";
-		}
-		return c.accountsToString();
+		return customerService.hasCustomer(customerID.getKey());
 	}
 
 	public synchronized CustomerID checkLogInDetails(String userName, String password) {
-		Customer customer = customers.get(userName);
-		if (customer != null && customer.checkPassword(password)) {
+		if (customerService.authenticate(userName, password)) {
 			return new CustomerID(userName);
 		}
 		return null;
+	}
+
+	// Optional: if any old code still calls this
+	public String showMyAccounts(CustomerID customerID) {
+		return accountService.showAccounts(customerID);
 	}
 }
