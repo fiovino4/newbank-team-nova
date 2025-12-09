@@ -77,48 +77,45 @@ public class LoanService {
      *            The interest rate is zero or negative
      *            The term is zero or negative
      */
-    public synchronized Loan offerLoan(CustomerID lenderId, String fromAccount, double amount, double interestRate, int termMonths, String extraTerms){
+    public synchronized Loan offerLoan(CustomerID lenderId, String fromAccount, double amount, double interestRate, int termMonths, String extraTerms) {
 
-        Customer lender = newBank.getCustomer(lenderId.getKey());
 
-        if (lender == null){
+        if (!newBank.getCustomerService().hasCustomer(lenderId.getKey())) {
             throw new IllegalArgumentException("Unknown lender");
         }
 
-        Account account = lender.getAccountByName(fromAccount);
+        Account account = newBank.getAccountService().getAccount(lenderId, fromAccount);
         if (account == null) {
             throw new IllegalArgumentException("Account '" + fromAccount + "' does not exist.");
         }
 
-        if(amount <= 0){
-            throw new IllegalArgumentException("Amount must be grater then 0");
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be greater than 0.");
         }
 
-        if(amount > account.getBalance()){
-            throw  new IllegalArgumentException( "The loan amount cannot exceed the available balance of the account.");
+        if (amount > account.getBalance()) {
+            throw new IllegalArgumentException(
+                    "The loan amount cannot exceed the available balance of the account."
+            );
         }
 
-        if (interestRate <= 0){
+        if (interestRate <= 0) {
             throw new IllegalArgumentException("Interest rate must be greater than 0.");
         }
 
-        if (termMonths <= 0){
+        if (termMonths <= 0) {
             throw new IllegalArgumentException("Term must be greater than 0.");
         }
 
-        /*After the input check create the new Loan:
-         - generate first the sequence for the id TODO: re-write this logic after db implementation
-         - then generate the Loan object and push into the HashMap loan.
-            NB: when the loan is created the status is set as ACTIVE
-         */
-
         int id = nextLoanId.getAndIncrement();
-        Loan loan = new Loan(id, lenderId, fromAccount, amount, interestRate, termMonths, extraTerms, LoanStatus.AVAILABLE);
+        Loan loan = new Loan(id, lenderId, fromAccount, amount, interestRate, termMonths, extraTerms, LoanStatus.AVAILABLE
+        );
 
         loans.put(id, loan);
 
         return loan;
     }
+
 
     /**
      * Processes a request from a borrower to request an existing loan.
@@ -195,7 +192,6 @@ public class LoanService {
         StringBuilder sb = new StringBuilder();
 
         for (Loan loan : loans.values()) {
-
             if (loan.getLender().getKey().equalsIgnoreCase(customerName)) {
                 if (sb.isEmpty()) {
                     sb.append("Your loan offers:").append(System.lineSeparator());
