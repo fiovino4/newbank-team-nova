@@ -4,10 +4,12 @@ package newbank.tests;
 import newbank.server.NewBank;
 import newbank.server.model.CustomerID;
 import newbank.server.service.LoanService;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.*;
+//import static org.junit.jupiter.api.Assertions.*;
 
 public class LoanServiceTest {
 
@@ -26,7 +28,10 @@ public class LoanServiceTest {
         );
 
         String after = loanService.showAvailableLoans();
-        assertEquals(before, after, "Marketplace should be unchanged after invalid loan attempt");
+        assertEquals("Marketplace should be unchanged after invalid loan attempt",
+                before,
+                after
+        );
     }
 }
 // Verifies that offering a negative loan amount is rejected and does not alter the loan marketplace.

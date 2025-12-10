@@ -75,7 +75,7 @@ public class NewBankTest {
     @Test
     public void shouldLoginSuccessfullyWithCorrectCredentials() {
         NewBank bank = NewBank.getBank();
-        CustomerID id = bank.checkLogInDetails("Bhagy", ""); // Assuming "" is a valid password for test data
+        CustomerID id = bank.checkLogInDetails("Bhagy", "1234"); // Assuming "" is a valid password for test data
         assertNotNull(id);
         String response = bank.processRequest(id, "SHOWMYACCOUNTS");
         assertTrue(response.contains("Main"));
