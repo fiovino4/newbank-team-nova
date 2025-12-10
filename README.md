@@ -21,13 +21,50 @@ This version includes improvements from:
 
 ```
 newbank-team-nova/
- ├── src/
- │   ├── newbank/client/
- │   ├── newbank/server/
- │   ├── newbank/server/security
- ├── README.md
- ├── CONTRIBUTING.md
- ├── CHANGELOG.md
+├── src/
+│   └── newbank/
+│       ├── client/
+│       │   ├── ClientApp.java
+│       │   ├── ClientConnection.java
+│       │   ├── CommandParser.java
+│       │   ├── ConsoleUI.java
+│       │   ├── NetworkClient.java
+│       │   └── ParsedCommand.java
+│       │
+│       ├── server/
+│       │   ├── NewBank.java
+│       │   ├── NewBankClientHandler.java
+│       │   ├── NewBankServer.java
+│       │   ├── CommandProcessor.java
+│       │   │
+│       │   ├── model/
+│       │   │   ├── Account.java
+│       │   │   ├── Customer.java
+│       │   │   ├── CustomerID.java
+│       │   │   ├── Loan.java
+│       │   │   ├── LoanStatus.java
+│       │   │   └── Notification.java
+│       │   │
+│       │   ├── service/
+│       │   │   ├── AccountService.java
+│       │   │   ├── CustomerService.java
+│       │   │   ├── LoanService.java
+│       │   │   ├── NotificationService.java
+│       │   │   └── security/
+│       │   │       └── PasswordManagerService.java
+│       │
+│       └── tests/
+│           ├── AccountTest.java
+│           ├── CommandParserTest.java
+│           ├── CustomerTest.java
+│           ├── LoanServiceTest.java
+│           ├── NewBankClientHandlerTest.java
+│           ├── NewBankLoginTest.java
+│           └── NewBankTest.java
+│
+├── README.md
+├── CONTRIBUTING.md
+└── CHANGELOG.md
 ```
 
 ---
@@ -137,17 +174,17 @@ Confirm 'Holiday'? (YES / EXIT):
 # 📚 Command Reference
 
 | Command | Description |
-|--------|-------------|
+|--------|------------|
 | `BALANCE` / `SHOWMYACCOUNTS` | Show all accounts |
-| `CREATEACCOUNT <name>` | Create account *(in development)* |
-| `CLOSEACCOUNT <name>` | Close account *(in development)* |
+| `CREATEACCOUNT <name>` | Create account |
+| `CLOSEACCOUNT <name>` | Close account |
 | `TRANSFER <from> <to> <amount>` | Move funds |
 | `VIEWTRANSACTIONS <name>` | View history *(in development)* |
-| `OFFERLOAN <from> <amount> <rate> <term>` | Offer loan *(in development)* |
+| `OFFERLOAN <from> <amount> <rate> <term>` | Offer loan |
 | `REQUESTLOAN <to> <amount> <maxRate> <term>` | Request loan *(in development)* |
-| `SHOWAVAILABLELOANS` | View active loans *(in development)* |
+| `SHOWAVAILABLELOANS` | View active loans |
 | `ACCEPTLOAN <id>` | Accept loan *(in development)* |
-| `MYLOANS` | Show user loans *(in development)* |
+| `MYLOANS` | Show user loans |
 | `REPAYLOAN <id> <amount>` | Repay loan *(in development)* |
 | `HELP` | Show help |
 | `LOGOUT` / `EXIT` / `QUIT` | End session |
@@ -157,37 +194,85 @@ Confirm 'Holiday'? (YES / EXIT):
 # 🧱 Architecture
 
 ```
-           +----------------------------+
-           |         ClientApp          |
-           |  (User input + UI logic)   |
-           +-------------+--------------+
-                         |
-                         v
-              ConsoleUI + CommandParser
-                         |
-                         v   Socket Connection
-+----------------------------------------------------------+
-|                    NewBankServer                         |
-|----------------------------------------------------------|
-|   Accepts connections → Creates NewBankClientHandler     |
-+-----------------------+----------------------------------+
-                        |
-                        v
-              +-------------------------+
-              | NewBankClientHandler    |
-              | (login + request loop)  |
-              +------------+------------+
-                           |
-                           v
-                 +------------------+
-                 | CommandProcessor |
-                 +------------------+
-                           |
-                           v
-                +----------------------+
-                |      NewBank         |
-                | Accounts, Customers  |
-                +----------------------+
+                         +----------------------------+
+                         |         ClientApp          |
+                         |         (main entry)       |
+                         +-------------+--------------+
+                                       |
+                                       v
+                         +----------------------------+
+                         |          ConsoleUI         |
+                         |  (login / prompts / flows) |
+                         +-------------+--------------+
+                                       |
+                                       v
+                     +-----------------+-----------------+
+                     |        CommandParser              |
+                     |        ParsedCommand              |
+                     | (parse + validate user commands)  |
+                     +-----------------+-----------------+
+                                       |
+                                       v
+                         +----------------------------+
+                         |    NetworkClient /         |
+                         |    ClientConnection        |
+                         | (socket connect + I/O)     |
+                         +-------------+--------------+
+                                       |
+                              Socket connection
+                                       |
+                                       v
++--------------------------------------------------------------------+
+|                           NewBankServer                            |
+|--------------------------------------------------------------------|
+|  Listens on port → accepts Socket → spawns NewBankClientHandler    |
++-------------------------------+------------------------------------+
+                                |
+                                v
+                     +----------------------------+
+                     |     NewBankClientHandler   |
+                     |   (login + request loop)   |
+                     +-------------+--------------+
+                                       |
+                                       v
+                             +-------------------+
+                             |  CommandProcessor |
+                             | (server commands) |
+                             +---------+---------+
+                                       |
+                                       v
+                               +---------------+
+                               |    NewBank    |
+                               |  (facade API) |
+                               +---+-----+-----+
+                                   |     |
+        +--------------------------+     +--------------------------+
+        v                                                    v
++------------------------+                     +------------------------+
+|    CustomerService     |                     |    AccountService      |
+| - register / authenticate                  |  - create / close       |
+| - lookup Customer                          |  - deposit / withdraw   |
+| - hasCustomer                              |  - transfer             |
++------------------------+                     +------------------------+
+        |
+        v
++------------------------+
+| PasswordManagerService |
+| (hash + verify pw)     |
++------------------------+
+
+        +------------------------+          +---------------------------+
+        |      LoanService       |          |   NotificationService     |
+        | - offer / list loans   |          | - create notifications    |
+        | - validate accounts    |          | - (future delivery, etc.) |
+        +------------+-----------+          +-------------+-------------+
+                     |                                      |
+                     v                                      v
+        +---------------------------+        +---------------------------+
+        |        model.*            |        |          model.*          |
+        |  Account, Customer,       |        |  Notification, CustomerID |
+        |  Loan, LoanStatus         |        |                           |
+        +---------------------------+        +---------------------------+
 ```
 
 ---
